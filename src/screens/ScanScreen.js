@@ -1,12 +1,33 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
+import TextRecognition from '@react-native-ml-kit/text-recognition';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography } from '../constants';
 import { GradientButton } from '../components/GradientButton';
 
+const parseIngredients = (ocrText) => {
+  // OCR metninden içerikleri ayıkla
+  // Kozmetik etiketlerinde içerikler genelde virgül ile ayrılır
+  // "Ingredients:" veya "INGREDIENTS:" başlığını kaldır
+  let cleaned = ocrText
+    .replace(/ingredients\s*[:;]/i, '')
+    .replace(/\n/g, ' ')
+    .trim();
+
+  // Virgül, noktalı virgül veya "•" ile ayır
+  const items = cleaned
+    .split(/[,;•·]/)
+    .map((item) => item.trim())
+    .filter((item) => item.length > 1 && item.length < 80);
+
+  return [...new Set(items)]; // Tekrarları kaldır
+};
+
 export const ScanScreen = ({ navigation }) => {
   const [permission, requestPermission] = useCameraPermissions();
+  const [processing, setProcessing] = useState(false);
+  const [flashOn, setFlashOn] = useState(false);
   const cameraRef = useRef(null);
 
   if (!permission) {
@@ -31,35 +52,69 @@ export const ScanScreen = ({ navigation }) => {
   }
 
   const handleCapture = async () => {
-    // Mock: Kamera ile çekim yapıldığında örnek içerik listesi döndür
-    // Backend entegrasyonunda OCR ile gerçek metin çıkarılacak
-    const mockIngredients = [
-      'Water',
-      'Niacinamide',
-      'Glycerin',
-      'Hyaluronic Acid',
-      'Fragrance',
-      'Methylparaben',
-      'Vitamin E',
-    ];
+    if (!cameraRef.current || processing) return;
 
-    Alert.alert(
-      'Ingredients Detected',
-      `Found ${mockIngredients.length} ingredients from the label.`,
-      [
-        {
-          text: 'Analyze',
-          onPress: () =>
-            navigation.navigate('AnalysisResult', { ingredients: mockIngredients }),
-        },
-        { text: 'Retake', style: 'cancel' },
-      ]
-    );
+    try {
+      setProcessing(true);
+
+      // Fotoğraf çek
+      const photo = await cameraRef.current.takePictureAsync({
+        quality: 0.8,
+        skipProcessing: false,
+      });
+
+      // ML Kit OCR ile metni oku
+      const result = await TextRecognition.recognize(photo.uri);
+
+      if (!result || !result.text || result.text.trim().length === 0) {
+        Alert.alert(
+          'Text Not Found',
+          'No text was detected in the image. Please try again or enter ingredients manually.',
+          [
+            { text: 'Retry', style: 'cancel' },
+            { text: 'Manual Entry', onPress: () => navigation.navigate('ManualEntry') },
+          ]
+        );
+        return;
+      }
+
+      const fullText = result.text;
+      const ingredients = parseIngredients(fullText);
+
+      if (ingredients.length === 0) {
+        Alert.alert(
+          'No Ingredients Found',
+          'Could not identify ingredients from the text. Please try again or enter manually.',
+          [
+            { text: 'Retry', style: 'cancel' },
+            { text: 'Manual Entry', onPress: () => navigation.navigate('ManualEntry') },
+          ]
+        );
+        return;
+      }
+
+      Alert.alert(
+        'Ingredients Detected',
+        `Found ${ingredients.length} ingredients from the label.`,
+        [
+          {
+            text: 'Analyze',
+            onPress: () =>
+              navigation.navigate('AnalysisResult', { ingredients }),
+          },
+          { text: 'Retake', style: 'cancel' },
+        ]
+      );
+    } catch (error) {
+      Alert.alert('Error', 'An error occurred while scanning. Please try again.');
+    } finally {
+      setProcessing(false);
+    }
   };
 
   return (
     <View style={styles.container}>
-      <CameraView style={styles.camera} ref={cameraRef}>
+      <CameraView style={styles.camera} ref={cameraRef} enableTorch={flashOn}>
         <View style={styles.overlay}>
           <View style={styles.topBar}>
             <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
@@ -90,12 +145,16 @@ export const ScanScreen = ({ navigation }) => {
               <Text style={styles.controlLabel}>Manual</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={handleCapture} style={styles.captureButton}>
-              <View style={styles.captureInner} />
+            <TouchableOpacity onPress={handleCapture} style={styles.captureButton} disabled={processing}>
+              {processing ? (
+                <ActivityIndicator size="large" color={Colors.primary} />
+              ) : (
+                <View style={styles.captureInner} />
+              )}
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.controlButton}>
-              <Ionicons name="flash-outline" size={24} color={Colors.textWhite} />
+            <TouchableOpacity style={styles.controlButton} onPress={() => setFlashOn(!flashOn)}>
+              <Ionicons name={flashOn ? 'flash' : 'flash-outline'} size={24} color={Colors.textWhite} />
               <Text style={styles.controlLabel}>Flash</Text>
             </TouchableOpacity>
           </View>
