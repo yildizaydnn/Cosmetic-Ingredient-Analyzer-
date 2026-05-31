@@ -7,15 +7,39 @@ import { IngredientCard } from '../components/IngredientCard';
 import { analyzeIngredients } from '../services/mockData';
 
 export const AnalysisResultScreen = ({ route, navigation }) => {
-  const { ingredients } = route.params;
-  const analyzed = analyzeIngredients(ingredients);
+  const params = route.params;
 
-  const safeCount = analyzed.filter((i) => i.riskLevel === 'safe').length;
-  const mediumCount = analyzed.filter((i) => i.riskLevel === 'medium').length;
-  const unsafeCount = analyzed.filter((i) => i.riskLevel === 'unsafe').length;
+  // Backend'den gelen format veya eski mock format
+  let ingredients, summary, disclaimer;
+
+  if (params.analysisResult) {
+    // Backend response
+    ({ ingredients, summary, disclaimer } = params.analysisResult);
+  } else {
+    // Eski format (HistoryScreen, HomeScreen) — mock data ile analiz
+    const analyzed = analyzeIngredients(params.ingredients);
+    ingredients = analyzed.map((item, index) => ({
+      ...item,
+      position: index + 1,
+      positionWeight: 1.0,
+    }));
+    const safeItems = ingredients.filter((i) => i.riskLevel === 'safe').length;
+    const mediumItems = ingredients.filter((i) => i.riskLevel === 'medium').length;
+    summary = {
+      beneficial_count: safeItems,
+      neutral_count: 0,
+      caution_count: mediumItems,
+      unknown_count: 0,
+    };
+    disclaimer = null;
+  }
+
+  const safeCount = summary.beneficial_count + summary.neutral_count;
+  const mediumCount = summary.caution_count + summary.unknown_count;
 
   const overallStatus =
-    unsafeCount > 0 ? 'unsafe' : mediumCount > 0 ? 'medium' : 'safe';
+    mediumCount > ingredients.length / 2 ? 'unsafe' :
+    mediumCount > 0 ? 'medium' : 'safe';
 
   const statusConfig = {
     safe: { label: 'Safe Product', color: Colors.safe, icon: 'shield-checkmark' },
@@ -54,7 +78,7 @@ export const AnalysisResultScreen = ({ route, navigation }) => {
             <Ionicons name={status.icon} size={36} color={Colors.textWhite} />
             <Text style={styles.summaryLabel}>{status.label}</Text>
             <Text style={styles.summaryDetail}>
-              {safeCount} out of {analyzed.length} ingredients are safe
+              {safeCount} out of {ingredients.length} ingredients are safe
             </Text>
           </View>
         </LinearGradient>
@@ -72,17 +96,11 @@ export const AnalysisResultScreen = ({ route, navigation }) => {
                 <Text style={styles.breakdownCount}>{mediumCount}</Text>
               </View>
             )}
-            {unsafeCount > 0 && (
-              <View style={styles.breakdownBadge}>
-                <View style={[styles.dot, { backgroundColor: Colors.unsafe }]} />
-                <Text style={styles.breakdownCount}>{unsafeCount}</Text>
-              </View>
-            )}
           </View>
         </View>
 
         <View style={styles.ingredientList}>
-          {analyzed.map((ingredient, index) => (
+          {ingredients.map((ingredient, index) => (
             <IngredientCard
               key={index}
               ingredient={ingredient}
@@ -92,6 +110,13 @@ export const AnalysisResultScreen = ({ route, navigation }) => {
             />
           ))}
         </View>
+
+        {disclaimer && (
+          <View style={styles.disclaimerContainer}>
+            <Ionicons name="information-circle-outline" size={16} color={Colors.textLight} />
+            <Text style={styles.disclaimerText}>{disclaimer}</Text>
+          </View>
+        )}
 
         <View style={{ height: 30 }} />
       </ScrollView>
@@ -182,5 +207,21 @@ const styles = StyleSheet.create({
   },
   ingredientList: {
     paddingHorizontal: 20,
+  },
+  disclaimerContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginHorizontal: 20,
+    marginTop: 20,
+    padding: 14,
+    backgroundColor: Colors.white,
+    borderRadius: 12,
+  },
+  disclaimerText: {
+    ...Typography.caption,
+    color: Colors.textLight,
+    marginLeft: 8,
+    flex: 1,
+    lineHeight: 18,
   },
 });

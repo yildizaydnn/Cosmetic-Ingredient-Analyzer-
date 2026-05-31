@@ -5,14 +5,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography } from '../constants';
 import { RiskBadge } from '../components/RiskBadge';
 
-const skinTypeLabels = {
-  normal: 'Normal Skin',
-  dry: 'Dry Skin',
-  oily: 'Oily Skin',
-  combination: 'Combination Skin',
-  sensitive: 'Sensitive Skin',
-};
-
 const riskColors = {
   safe: { gradient: [Colors.safe, '#16A34A'], icon: 'shield-checkmark' },
   medium: { gradient: [Colors.mediumRisk, '#EA580C'], icon: 'warning' },
@@ -42,27 +34,57 @@ export const IngredientDetailScreen = ({ route, navigation }) => {
           end={{ x: 1, y: 0 }}
         >
           <View style={styles.ingredientHeaderContent}>
-            <View>
+            <View style={{ flex: 1 }}>
               <Text style={styles.ingredientName}>{ingredient.name}</Text>
+              {ingredient.matchedAs && (
+                <Text style={styles.matchedAs}>Matched as: {ingredient.matchedAs}</Text>
+              )}
               <View style={styles.badges}>
                 <RiskBadge riskLevel={ingredient.riskLevel} style={styles.riskBadgeOverride} />
-                <View style={styles.categoryBadge}>
-                  <Text style={styles.categoryBadgeText}>{ingredient.category}</Text>
-                </View>
+                {ingredient.category && ingredient.category !== 'Unknown' && (
+                  <View style={styles.categoryBadge}>
+                    <Text style={styles.categoryBadgeText}>{ingredient.category}</Text>
+                  </View>
+                )}
+                {ingredient.source === 'ai' && (
+                  <View style={[styles.categoryBadge, { backgroundColor: 'rgba(124,58,237,0.3)' }]}>
+                    <Text style={styles.categoryBadgeText}>AI</Text>
+                  </View>
+                )}
               </View>
             </View>
             <Ionicons name={risk.icon} size={32} color="rgba(255,255,255,0.9)" />
           </View>
         </LinearGradient>
 
-        {/* What is it? */}
-        <View style={styles.card}>
-          <View style={styles.cardHeader}>
-            <Ionicons name="information-circle-outline" size={22} color={Colors.primary} />
-            <Text style={styles.cardTitle}>What is it?</Text>
+        {/* Position Info */}
+        {ingredient.position && (
+          <View style={styles.card}>
+            <View style={styles.cardHeader}>
+              <Ionicons name="list-outline" size={22} color={Colors.primary} />
+              <Text style={styles.cardTitle}>Position in Formula</Text>
+            </View>
+            <Text style={styles.cardBody}>
+              #{ingredient.position} in the ingredient list
+              {ingredient.positionWeight >= 1.0
+                ? ' — High concentration'
+                : ingredient.positionWeight >= 0.5
+                ? ' — Medium concentration'
+                : ' — Low concentration'}
+            </Text>
           </View>
-          <Text style={styles.cardBody}>{ingredient.description}</Text>
-        </View>
+        )}
+
+        {/* What is it? */}
+        {ingredient.description ? (
+          <View style={styles.card}>
+            <View style={styles.cardHeader}>
+              <Ionicons name="information-circle-outline" size={22} color={Colors.primary} />
+              <Text style={styles.cardTitle}>What is it?</Text>
+            </View>
+            <Text style={styles.cardBody}>{ingredient.description}</Text>
+          </View>
+        ) : null}
 
         {/* Why Risk? */}
         {ingredient.whyRisk && (
@@ -74,41 +96,25 @@ export const IngredientDetailScreen = ({ route, navigation }) => {
               </Text>
             </View>
             <Text style={styles.cardBody}>{ingredient.whyRisk}</Text>
-            {ingredient.whyRiskDetails && (
-              <View style={styles.riskDetails}>
-                {ingredient.whyRiskDetails.map((detail, index) => (
-                  <View key={index} style={styles.riskDetailItem}>
-                    <View style={[styles.bulletDot, { backgroundColor: Colors.mediumRisk }]} />
-                    <Text style={styles.riskDetailText}>{detail}</Text>
-                  </View>
-                ))}
-              </View>
-            )}
           </View>
         )}
 
-        {/* Skin Type Suitability */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Skin Type Suitability</Text>
-          <View style={styles.suitabilityList}>
-            {Object.entries(ingredient.skinSuitability).map(([type, suitable]) => (
-              <View key={type} style={styles.suitabilityItem}>
-                <Text style={styles.suitabilityLabel}>{skinTypeLabels[type]}</Text>
-                <Ionicons
-                  name={suitable ? 'checkmark-circle' : 'close-circle'}
-                  size={24}
-                  color={suitable ? Colors.safe : Colors.unsafe}
-                />
-              </View>
-            ))}
+        {/* Unknown Note */}
+        {ingredient.note && (
+          <View style={styles.card}>
+            <View style={styles.cardHeader}>
+              <Ionicons name="help-circle-outline" size={22} color={Colors.textLight} />
+              <Text style={styles.cardTitle}>Note</Text>
+            </View>
+            <Text style={styles.cardBody}>{ingredient.note}</Text>
           </View>
-        </View>
+        )}
 
         {/* Recommendation */}
         {ingredient.recommendation && (
           <View style={styles.recommendationCard}>
             <Text style={styles.recommendationText}>
-              <Text style={styles.recommendationLabel}>💡 Recommendation: </Text>
+              <Text style={styles.recommendationLabel}>Recommendation: </Text>
               {ingredient.recommendation}
             </Text>
           </View>
@@ -159,11 +165,18 @@ const styles = StyleSheet.create({
   ingredientName: {
     ...Typography.h2,
     color: Colors.textWhite,
-    marginBottom: 10,
+    marginBottom: 4,
+  },
+  matchedAs: {
+    ...Typography.caption,
+    color: 'rgba(255,255,255,0.7)',
+    marginBottom: 8,
   },
   badges: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 8,
+    marginTop: 6,
   },
   riskBadgeOverride: {
     backgroundColor: 'rgba(255,255,255,0.25)',
@@ -205,41 +218,6 @@ const styles = StyleSheet.create({
     ...Typography.body,
     color: Colors.textSecondary,
     lineHeight: 22,
-  },
-  riskDetails: {
-    marginTop: 12,
-  },
-  riskDetailItem: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginBottom: 8,
-  },
-  bulletDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    marginTop: 7,
-    marginRight: 10,
-  },
-  riskDetailText: {
-    ...Typography.body,
-    color: Colors.textSecondary,
-    flex: 1,
-  },
-  suitabilityList: {
-    marginTop: 8,
-  },
-  suitabilityItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.borderLight,
-  },
-  suitabilityLabel: {
-    ...Typography.body,
-    color: Colors.textPrimary,
   },
   recommendationCard: {
     backgroundColor: '#EEF2FF',

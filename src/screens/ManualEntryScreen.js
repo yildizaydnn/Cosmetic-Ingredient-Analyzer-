@@ -7,19 +7,43 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
+  Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography } from '../constants';
 import { GradientButton } from '../components/GradientButton';
-import { parseIngredients } from '../services/mockData';
+import { useAuth } from '../context/AuthContext';
+import { analyzeText } from '../services/api';
+
+const parseIngredients = (text) => {
+  return text
+    .split(/[,\n]+/)
+    .map((i) => i.trim())
+    .filter((i) => i.length > 0);
+};
 
 export const ManualEntryScreen = ({ navigation }) => {
   const [text, setText] = useState('');
+  const [loading, setLoading] = useState(false);
+  const { skinType } = useAuth();
 
-  const handleAnalyze = () => {
+  const handleAnalyze = async () => {
     const ingredients = parseIngredients(text);
     if (ingredients.length === 0) return;
-    navigation.navigate('AnalysisResult', { ingredients });
+
+    try {
+      setLoading(true);
+      const result = await analyzeText(text, skinType);
+      navigation.navigate('AnalysisResult', { analysisResult: result });
+    } catch (error) {
+      Alert.alert(
+        'Analysis Failed',
+        error.message || 'Could not analyze ingredients. Please check your connection and try again.'
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handlePasteExample = () => {
@@ -57,10 +81,11 @@ export const ManualEntryScreen = ({ navigation }) => {
             multiline
             numberOfLines={8}
             textAlignVertical="top"
+            editable={!loading}
           />
         </View>
 
-        <TouchableOpacity onPress={handlePasteExample} style={styles.exampleButton}>
+        <TouchableOpacity onPress={handlePasteExample} style={styles.exampleButton} disabled={loading}>
           <Ionicons name="clipboard-outline" size={18} color={Colors.primary} />
           <Text style={styles.exampleText}>Paste example ingredients</Text>
         </TouchableOpacity>
@@ -76,11 +101,18 @@ export const ManualEntryScreen = ({ navigation }) => {
       </View>
 
       <View style={styles.footer}>
-        <GradientButton
-          title="Analyze Ingredients"
-          onPress={handleAnalyze}
-          style={[!text.trim() && styles.buttonDisabled]}
-        />
+        {loading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="small" color={Colors.primary} />
+            <Text style={styles.loadingText}>Analyzing...</Text>
+          </View>
+        ) : (
+          <GradientButton
+            title="Analyze Ingredients"
+            onPress={handleAnalyze}
+            style={[!text.trim() && styles.buttonDisabled]}
+          />
+        )}
       </View>
     </KeyboardAvoidingView>
   );
@@ -164,6 +196,17 @@ const styles = StyleSheet.create({
   footer: {
     paddingHorizontal: 20,
     paddingBottom: 40,
+  },
+  loadingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+  },
+  loadingText: {
+    ...Typography.body,
+    color: Colors.primary,
+    marginLeft: 10,
   },
   buttonDisabled: {
     opacity: 0.5,
