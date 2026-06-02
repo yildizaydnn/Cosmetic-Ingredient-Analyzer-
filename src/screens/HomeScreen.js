@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  TextInput,
   TouchableOpacity,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
@@ -73,15 +72,6 @@ export const HomeScreen = ({ navigation }) => {
         <Text style={styles.greetingSubtext}>Cilt bakım ürünlerini kontrol edelim</Text>
       </View>
 
-      <View style={styles.searchContainer}>
-        <Ionicons name="search-outline" size={20} color={Colors.textLight} />
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Ürün veya içerik ara"
-          placeholderTextColor={Colors.textLight}
-        />
-      </View>
-
       <View style={styles.actions}>
         <ActionCard
           title="İçerikleri Tara"
@@ -95,13 +85,6 @@ export const HomeScreen = ({ navigation }) => {
           subtitle="İçerik listesini yaz veya yapıştır"
           icon="create-outline"
           colors={['#4ECDC4', '#34D399']}
-          onPress={() => navigation.navigate('ManualEntry')}
-        />
-        <ActionCard
-          title="Ürün Analizi"
-          subtitle="Detaylı güvenlik raporu al"
-          icon="analytics-outline"
-          colors={['#A78BFA', '#7C3AED']}
           onPress={() => navigation.navigate('ManualEntry')}
         />
       </View>
@@ -152,23 +135,6 @@ const styles = StyleSheet.create({
     ...Typography.body,
     color: Colors.textSecondary,
     marginTop: 4,
-  },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: Colors.white,
-    borderRadius: 14,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    marginBottom: 20,
-    borderWidth: 1,
-    borderColor: Colors.borderLight,
-  },
-  searchInput: {
-    flex: 1,
-    ...Typography.body,
-    color: Colors.textPrimary,
-    marginLeft: 10,
   },
   actions: {
     marginBottom: 24,

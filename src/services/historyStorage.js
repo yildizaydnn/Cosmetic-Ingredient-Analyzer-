@@ -3,7 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const HISTORY_KEY = 'analysis_history';
 const MAX_HISTORY = 50;
 
-export async function saveAnalysis({ productName, ingredients, summary, skinType }) {
+export async function saveAnalysis({ productName, ingredients, summary, skinType, productSummary }) {
   const safeCount = (summary?.beneficial_count || 0) + (summary?.neutral_count || 0);
   const cautionCount = summary?.caution_count || 0;
   const unknownCount = summary?.unknown_count || 0;
@@ -24,6 +24,7 @@ export async function saveAnalysis({ productName, ingredients, summary, skinType
     skinType,
     ingredients,
     summary,
+    productSummary: productSummary || null,
   };
 
   const history = await getHistory();

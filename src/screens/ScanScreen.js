@@ -68,7 +68,7 @@ export const ScanScreen = ({ navigation }) => {
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={Colors.primary} />
         <Text style={styles.loadingText}>İçerikler analiz ediliyor...</Text>
-        <Text style={styles.loadingSubtext}>Bu birkaç saniye sürebilir</Text>
+        <Text style={styles.loadingSubtext}>Görsel okunuyor ve içerikler analiz ediliyor, bu işlem 1 dakika kadar sürebilir</Text>
       </View>
     );
   }

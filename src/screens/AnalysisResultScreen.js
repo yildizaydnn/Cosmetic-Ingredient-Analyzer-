@@ -16,15 +16,15 @@ export const AnalysisResultScreen = ({ route, navigation }) => {
   const [editing, setEditing] = useState(false);
 
   // Backend'den gelen format veya eski mock format
-  let ingredients, summary, disclaimer;
+  let ingredients, summary, disclaimer, productSummary;
   let initialProductName = params.productName || '';
 
   if (params.analysisResult) {
     // Backend response
-    ({ ingredients, summary, disclaimer } = params.analysisResult);
+    ({ ingredients, summary, disclaimer, productSummary } = params.analysisResult);
   } else if (params.historyItem) {
     // Geçmişten gelen — tekrar kaydetme
-    ({ ingredients, summary } = params.historyItem);
+    ({ ingredients, summary, productSummary } = params.historyItem);
     initialProductName = params.historyItem.productName || '';
     disclaimer = null;
     saved.current = true;
@@ -57,6 +57,7 @@ export const AnalysisResultScreen = ({ route, navigation }) => {
         ingredients,
         summary,
         skinType,
+        productSummary,
       }).then((entry) => {
         savedId.current = entry.id;
       }).catch(() => {});
@@ -144,6 +145,16 @@ export const AnalysisResultScreen = ({ route, navigation }) => {
             </Text>
           </View>
         </LinearGradient>
+
+        {productSummary && (
+          <View style={styles.productSummaryCard}>
+            <View style={styles.productSummaryHeader}>
+              <Ionicons name="chatbubble-ellipses-outline" size={18} color={Colors.primary} />
+              <Text style={styles.productSummaryTitle}>Genel Değerlendirme</Text>
+            </View>
+            <Text style={styles.productSummaryText}>{productSummary}</Text>
+          </View>
+        )}
 
         <View style={styles.breakdown}>
           <Text style={styles.breakdownTitle}>İçerik Dağılımı</Text>
@@ -239,6 +250,28 @@ const styles = StyleSheet.create({
     color: Colors.textPrimary,
     flex: 1,
     padding: 0,
+  },
+  productSummaryCard: {
+    marginHorizontal: 20,
+    marginTop: 14,
+    backgroundColor: Colors.white,
+    borderRadius: 16,
+    padding: 18,
+  },
+  productSummaryHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  productSummaryTitle: {
+    ...Typography.subtitle,
+    color: Colors.textPrimary,
+    marginLeft: 8,
+  },
+  productSummaryText: {
+    ...Typography.body,
+    color: Colors.textSecondary,
+    lineHeight: 22,
   },
   summaryCard: {
     marginHorizontal: 20,

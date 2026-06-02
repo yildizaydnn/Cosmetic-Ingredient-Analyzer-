@@ -67,6 +67,7 @@ function mapAnalysisResponse(data) {
     summary: data.summary,
     ingredients,
     disclaimer: data.disclaimer,
+    productSummary: data.product_summary || null,
   };
 }
 
@@ -82,18 +83,31 @@ export async function analyzeImage(imageUri, skinType, language = 'tr') {
   formData.append('skin_type', mapSkinType(skinType));
   formData.append('language', language);
 
-  const response = await fetch(`${API_URL}/analyze`, {
-    method: 'POST',
-    body: formData,
-  });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 120000);
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({}));
-    throw new Error(error.detail || `Server error: ${response.status}`);
+  try {
+    const response = await fetch(`${API_URL}/analyze`, {
+      method: 'POST',
+      body: formData,
+      signal: controller.signal,
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      throw new Error(error.detail || `Server error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return mapAnalysisResponse(data);
+  } catch (error) {
+    if (error.name === 'AbortError') {
+      throw new Error('Analiz zaman aşımına uğradı. Lütfen tekrar deneyin.');
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeout);
   }
-
-  const data = await response.json();
-  return mapAnalysisResponse(data);
 }
 
 // Metin ile analiz
