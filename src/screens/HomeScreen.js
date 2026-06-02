@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -7,11 +7,12 @@ import {
   TextInput,
   TouchableOpacity,
 } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography } from '../constants';
 import { useAuth } from '../context/AuthContext';
-import { mockHistory } from '../services/mockData';
+import { getHistory } from '../services/historyStorage';
 
 const ActionCard = ({ title, subtitle, icon, colors, onPress }) => (
   <TouchableOpacity onPress={onPress} activeOpacity={0.8} style={styles.actionCardWrapper}>
@@ -57,6 +58,13 @@ const HistoryItem = ({ item, onPress }) => {
 
 export const HomeScreen = ({ navigation }) => {
   const { user } = useAuth();
+  const [recentHistory, setRecentHistory] = useState([]);
+
+  useFocusEffect(
+    useCallback(() => {
+      getHistory().then((h) => setRecentHistory(h.slice(0, 3)));
+    }, [])
+  );
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -105,15 +113,21 @@ export const HomeScreen = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
-      {mockHistory.map((item) => (
-        <HistoryItem
-          key={item.id}
-          item={item}
-          onPress={() =>
-            navigation.navigate('AnalysisResult', { ingredients: item.ingredients })
-          }
-        />
-      ))}
+      {recentHistory.length === 0 ? (
+        <View style={styles.emptyHistory}>
+          <Text style={styles.emptyHistoryText}>Henüz analiz yapılmadı</Text>
+        </View>
+      ) : (
+        recentHistory.map((item) => (
+          <HistoryItem
+            key={item.id}
+            item={item}
+            onPress={() =>
+              navigation.navigate('AnalysisResult', { historyItem: item })
+            }
+          />
+        ))
+      )}
 
       <View style={{ height: 20 }} />
     </ScrollView>
@@ -245,5 +259,13 @@ const styles = StyleSheet.create({
   historyScoreText: {
     ...Typography.subtitle,
     fontSize: 18,
+  },
+  emptyHistory: {
+    alignItems: 'center',
+    paddingVertical: 24,
+  },
+  emptyHistoryText: {
+    ...Typography.body,
+    color: Colors.textLight,
   },
 });

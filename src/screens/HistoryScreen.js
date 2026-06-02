@@ -1,10 +1,47 @@
-import React from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography } from '../constants';
-import { mockHistory } from '../services/mockData';
+import { getHistory, clearHistory, deleteHistoryItem } from '../services/historyStorage';
 
 export const HistoryScreen = ({ navigation }) => {
+  const [history, setHistory] = useState([]);
+
+  useFocusEffect(
+    useCallback(() => {
+      getHistory().then(setHistory);
+    }, [])
+  );
+
+  const handleClearAll = () => {
+    Alert.alert('Geçmişi Temizle', 'Tüm analiz geçmişi silinecek. Emin misiniz?', [
+      { text: 'İptal', style: 'cancel' },
+      {
+        text: 'Temizle',
+        style: 'destructive',
+        onPress: async () => {
+          await clearHistory();
+          setHistory([]);
+        },
+      },
+    ]);
+  };
+
+  const handleDelete = (id) => {
+    Alert.alert('Analizi Sil', 'Bu analiz geçmişten silinecek.', [
+      { text: 'İptal', style: 'cancel' },
+      {
+        text: 'Sil',
+        style: 'destructive',
+        onPress: async () => {
+          await deleteHistoryItem(id);
+          setHistory((prev) => prev.filter((item) => item.id !== id));
+        },
+      },
+    ]);
+  };
+
   const renderItem = ({ item }) => {
     const total = item.safeCount + item.mediumCount + item.unsafeCount;
     const hasUnsafe = item.unsafeCount > 0;
@@ -15,12 +52,13 @@ export const HistoryScreen = ({ navigation }) => {
       <TouchableOpacity
         style={styles.card}
         onPress={() =>
-          navigation.navigate('AnalysisResult', { ingredients: item.ingredients })
+          navigation.navigate('AnalysisResult', { historyItem: item })
         }
+        onLongPress={() => handleDelete(item.id)}
         activeOpacity={0.7}
       >
         <View style={styles.cardContent}>
-          <Text style={styles.productName}>{item.productName}</Text>
+          <Text style={styles.productName} numberOfLines={1}>{item.productName}</Text>
           <View style={styles.meta}>
             <Ionicons name="time-outline" size={14} color={Colors.textLight} />
             <Text style={styles.date}>{item.date}</Text>
@@ -53,9 +91,14 @@ export const HistoryScreen = ({ navigation }) => {
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Geçmiş</Text>
+        {history.length > 0 && (
+          <TouchableOpacity onPress={handleClearAll}>
+            <Text style={styles.clearText}>Temizle</Text>
+          </TouchableOpacity>
+        )}
       </View>
       <FlatList
-        data={mockHistory}
+        data={history}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.list}
@@ -80,6 +123,9 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
   },
   header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     paddingTop: 60,
     paddingHorizontal: 20,
     paddingBottom: 16,
@@ -87,6 +133,11 @@ const styles = StyleSheet.create({
   title: {
     ...Typography.h1,
     color: Colors.textPrimary,
+  },
+  clearText: {
+    ...Typography.body,
+    color: Colors.unsafe,
+    fontWeight: '600',
   },
   list: {
     paddingHorizontal: 20,

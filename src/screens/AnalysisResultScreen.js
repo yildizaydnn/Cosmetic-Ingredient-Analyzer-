@@ -1,22 +1,35 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography } from '../constants';
 import { IngredientCard } from '../components/IngredientCard';
 import { analyzeIngredients } from '../services/mockData';
+import { saveAnalysis, updateHistoryItem } from '../services/historyStorage';
+import { useAuth } from '../context/AuthContext';
 
 export const AnalysisResultScreen = ({ route, navigation }) => {
   const params = route.params;
+  const { skinType } = useAuth();
+  const saved = useRef(false);
+  const savedId = useRef(null);
+  const [editing, setEditing] = useState(false);
 
   // Backend'den gelen format veya eski mock format
   let ingredients, summary, disclaimer;
+  let initialProductName = params.productName || '';
 
   if (params.analysisResult) {
     // Backend response
     ({ ingredients, summary, disclaimer } = params.analysisResult);
+  } else if (params.historyItem) {
+    // Geçmişten gelen — tekrar kaydetme
+    ({ ingredients, summary } = params.historyItem);
+    initialProductName = params.historyItem.productName || '';
+    disclaimer = null;
+    saved.current = true;
   } else {
-    // Eski format (HistoryScreen, HomeScreen) — mock data ile analiz
+    // Eski format (mock data ile analiz)
     const analyzed = analyzeIngredients(params.ingredients);
     ingredients = analyzed.map((item, index) => ({
       ...item,
@@ -33,6 +46,29 @@ export const AnalysisResultScreen = ({ route, navigation }) => {
     };
     disclaimer = null;
   }
+
+  const [productName, setProductName] = useState(initialProductName);
+
+  useEffect(() => {
+    if (!saved.current && ingredients && summary) {
+      saved.current = true;
+      saveAnalysis({
+        productName: productName || null,
+        ingredients,
+        summary,
+        skinType,
+      }).then((entry) => {
+        savedId.current = entry.id;
+      }).catch(() => {});
+    }
+  }, []);
+
+  const handleNameSubmit = () => {
+    setEditing(false);
+    if (savedId.current && productName.trim()) {
+      updateHistoryItem(savedId.current, { productName: productName.trim() }).catch(() => {});
+    }
+  };
 
   const safeCount = summary.beneficial_count + summary.neutral_count;
   const mediumCount = summary.caution_count + summary.unknown_count;
@@ -62,6 +98,32 @@ export const AnalysisResultScreen = ({ route, navigation }) => {
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
+        <TouchableOpacity
+          style={styles.productNameRow}
+          onPress={() => setEditing(true)}
+          activeOpacity={0.7}
+        >
+          {editing ? (
+            <TextInput
+              style={styles.productNameInput}
+              value={productName}
+              onChangeText={setProductName}
+              onBlur={handleNameSubmit}
+              onSubmitEditing={handleNameSubmit}
+              placeholder="Ürün adı girin..."
+              placeholderTextColor={Colors.textLight}
+              autoFocus
+            />
+          ) : (
+            <Text style={styles.productNameText} numberOfLines={1}>
+              {productName || 'Ürün adı ekle'}
+            </Text>
+          )}
+          {!editing && (
+            <Ionicons name="pencil-outline" size={16} color={Colors.textLight} />
+          )}
+        </TouchableOpacity>
+
         <LinearGradient
           colors={
             overallStatus === 'safe'
@@ -156,9 +218,31 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  productNameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginHorizontal: 20,
+    marginTop: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    backgroundColor: Colors.white,
+    borderRadius: 12,
+  },
+  productNameText: {
+    ...Typography.subtitle,
+    color: Colors.textPrimary,
+    flex: 1,
+  },
+  productNameInput: {
+    ...Typography.subtitle,
+    color: Colors.textPrimary,
+    flex: 1,
+    padding: 0,
+  },
   summaryCard: {
     marginHorizontal: 20,
-    marginTop: 16,
+    marginTop: 12,
     borderRadius: 20,
     padding: 24,
   },

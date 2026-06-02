@@ -24,6 +24,7 @@ const parseIngredients = (text) => {
 };
 
 export const ManualEntryScreen = ({ navigation }) => {
+  const [productName, setProductName] = useState('');
   const [text, setText] = useState('');
   const [loading, setLoading] = useState(false);
   const { skinType } = useAuth();
@@ -35,7 +36,10 @@ export const ManualEntryScreen = ({ navigation }) => {
     try {
       setLoading(true);
       const result = await analyzeText(text, skinType);
-      navigation.navigate('AnalysisResult', { analysisResult: result });
+      navigation.navigate('AnalysisResult', {
+        analysisResult: result,
+        productName: productName.trim() || null,
+      });
     } catch (error) {
       Alert.alert(
         'Analiz Başarısız',
@@ -66,7 +70,17 @@ export const ManualEntryScreen = ({ navigation }) => {
       </View>
 
       <View style={styles.content}>
-        <Text style={styles.label}>İçerik Listesi</Text>
+        <Text style={styles.label}>Ürün Adı</Text>
+        <TextInput
+          style={styles.productNameInput}
+          placeholder="Örn: CeraVe Nemlendirici Krem"
+          placeholderTextColor={Colors.textLight}
+          value={productName}
+          onChangeText={setProductName}
+          editable={!loading}
+        />
+
+        <Text style={[styles.label, { marginTop: 16 }]}>İçerik Listesi</Text>
         <Text style={styles.hint}>
           Ürünün içerik listesini yazın veya yapıştırın. Her içeriği virgülle ayırın.
         </Text>
@@ -163,6 +177,17 @@ const styles = StyleSheet.create({
     borderColor: Colors.border,
     padding: 14,
     minHeight: 180,
+  },
+  productNameInput: {
+    ...Typography.body,
+    color: Colors.textPrimary,
+    backgroundColor: Colors.inputBg,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    marginBottom: 4,
   },
   textArea: {
     ...Typography.body,

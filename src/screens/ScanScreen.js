@@ -17,7 +17,6 @@ export const ScanScreen = ({ navigation }) => {
       setProcessing(true);
       const result = await analyzeImage(imageUri, skinType);
       navigation.navigate('AnalysisResult', { analysisResult: result });
-
     } catch (error) {
       Alert.alert(
         'Analiz Başarısız',
