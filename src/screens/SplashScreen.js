@@ -19,12 +19,12 @@ export const SplashScreen = ({ navigation }) => {
             <Ionicons name="sparkles" size={36} color={Colors.textWhite} />
           </LinearGradient>
         </View>
-        <Text style={styles.title}>Cosmetic Ingredient{'\n'}Analyzer</Text>
-        <Text style={styles.subtitle}>Understand your skincare ingredients easily</Text>
+        <Text style={styles.title}>Kozmetik İçerik{'\n'}Analizörü</Text>
+        <Text style={styles.subtitle}>Cilt bakım ürünlerinin içeriklerini kolayca analiz edin</Text>
       </View>
 
       <GradientButton
-        title="Get Started"
+        title="Başlayın"
         onPress={() => navigation.replace('Welcome')}
         style={styles.button}
       />

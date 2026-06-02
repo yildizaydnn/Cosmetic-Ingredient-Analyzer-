@@ -61,37 +61,37 @@ export const HomeScreen = ({ navigation }) => {
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.greeting}>
-        <Text style={styles.greetingText}>Hi, {user?.name || 'User'} 👋</Text>
-        <Text style={styles.greetingSubtext}>Let's check your skincare products</Text>
+        <Text style={styles.greetingText}>Merhaba, {user?.name || 'Kullanıcı'} 👋</Text>
+        <Text style={styles.greetingSubtext}>Cilt bakım ürünlerini kontrol edelim</Text>
       </View>
 
       <View style={styles.searchContainer}>
         <Ionicons name="search-outline" size={20} color={Colors.textLight} />
         <TextInput
           style={styles.searchInput}
-          placeholder="Search cosmetic product or ingredient"
+          placeholder="Ürün veya içerik ara"
           placeholderTextColor={Colors.textLight}
         />
       </View>
 
       <View style={styles.actions}>
         <ActionCard
-          title="Scan Ingredients"
-          subtitle="Take a photo of product label"
+          title="İçerikleri Tara"
+          subtitle="Ürün etiketinin fotoğrafını çek"
           icon="camera-outline"
           colors={['#818CF8', '#6366F1']}
-          onPress={() => navigation.navigate('Scan')}
+          onPress={() => navigation.navigate('Tara')}
         />
         <ActionCard
-          title="Enter Manually"
-          subtitle="Type or paste ingredient list"
+          title="Manuel Giriş"
+          subtitle="İçerik listesini yaz veya yapıştır"
           icon="create-outline"
           colors={['#4ECDC4', '#34D399']}
           onPress={() => navigation.navigate('ManualEntry')}
         />
         <ActionCard
-          title="Analyze Product"
-          subtitle="Get detailed safety report"
+          title="Ürün Analizi"
+          subtitle="Detaylı güvenlik raporu al"
           icon="analytics-outline"
           colors={['#A78BFA', '#7C3AED']}
           onPress={() => navigation.navigate('ManualEntry')}
@@ -99,9 +99,9 @@ export const HomeScreen = ({ navigation }) => {
       </View>
 
       <View style={styles.historyHeader}>
-        <Text style={styles.historyTitle}>Recent Analysis</Text>
-        <TouchableOpacity onPress={() => navigation.navigate('History')}>
-          <Text style={styles.viewAll}>View All</Text>
+        <Text style={styles.historyTitle}>Son Analizler</Text>
+        <TouchableOpacity onPress={() => navigation.navigate('Geçmiş')}>
+          <Text style={styles.viewAll}>Tümünü Gör</Text>
         </TouchableOpacity>
       </View>
 

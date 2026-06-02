@@ -42,9 +42,9 @@ export const AnalysisResultScreen = ({ route, navigation }) => {
     mediumCount > 0 ? 'medium' : 'safe';
 
   const statusConfig = {
-    safe: { label: 'Safe Product', color: Colors.safe, icon: 'shield-checkmark' },
-    medium: { label: 'Use with Caution', color: Colors.mediumRisk, icon: 'warning' },
-    unsafe: { label: 'Not Recommended', color: Colors.unsafe, icon: 'alert-circle' },
+    safe: { label: 'Güvenli Ürün', color: Colors.safe, icon: 'shield-checkmark' },
+    medium: { label: 'Dikkatli Kullanın', color: Colors.mediumRisk, icon: 'warning' },
+    unsafe: { label: 'Önerilmiyor', color: Colors.unsafe, icon: 'alert-circle' },
   };
 
   const status = statusConfig[overallStatus];
@@ -55,7 +55,7 @@ export const AnalysisResultScreen = ({ route, navigation }) => {
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color={Colors.textPrimary} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Analysis Result</Text>
+        <Text style={styles.headerTitle}>Analiz Sonucu</Text>
         <TouchableOpacity style={styles.shareButton}>
           <Ionicons name="share-outline" size={22} color={Colors.textPrimary} />
         </TouchableOpacity>
@@ -78,13 +78,13 @@ export const AnalysisResultScreen = ({ route, navigation }) => {
             <Ionicons name={status.icon} size={36} color={Colors.textWhite} />
             <Text style={styles.summaryLabel}>{status.label}</Text>
             <Text style={styles.summaryDetail}>
-              {safeCount} out of {ingredients.length} ingredients are safe
+              {ingredients.length} içerikten {safeCount} tanesi güvenli
             </Text>
           </View>
         </LinearGradient>
 
         <View style={styles.breakdown}>
-          <Text style={styles.breakdownTitle}>Ingredient Breakdown</Text>
+          <Text style={styles.breakdownTitle}>İçerik Dağılımı</Text>
           <View style={styles.breakdownBadges}>
             <View style={styles.breakdownBadge}>
               <View style={[styles.dot, { backgroundColor: Colors.safe }]} />

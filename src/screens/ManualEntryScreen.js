@@ -38,8 +38,8 @@ export const ManualEntryScreen = ({ navigation }) => {
       navigation.navigate('AnalysisResult', { analysisResult: result });
     } catch (error) {
       Alert.alert(
-        'Analysis Failed',
-        error.message || 'Could not analyze ingredients. Please check your connection and try again.'
+        'Analiz Başarısız',
+        error.message || 'İçerikler analiz edilemedi. Bağlantınızı kontrol edip tekrar deneyin.'
       );
     } finally {
       setLoading(false);
@@ -61,20 +61,20 @@ export const ManualEntryScreen = ({ navigation }) => {
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color={Colors.textPrimary} />
         </TouchableOpacity>
-        <Text style={styles.title}>Enter Ingredients</Text>
+        <Text style={styles.title}>İçerik Girin</Text>
         <View style={{ width: 40 }} />
       </View>
 
       <View style={styles.content}>
-        <Text style={styles.label}>Ingredient List</Text>
+        <Text style={styles.label}>İçerik Listesi</Text>
         <Text style={styles.hint}>
-          Type or paste the ingredient list from the product. Separate each ingredient with a comma.
+          Ürünün içerik listesini yazın veya yapıştırın. Her içeriği virgülle ayırın.
         </Text>
 
         <View style={styles.textAreaContainer}>
           <TextInput
             style={styles.textArea}
-            placeholder="e.g. Water, Glycerin, Niacinamide, Hyaluronic Acid..."
+            placeholder="Örn: Water, Glycerin, Niacinamide, Hyaluronic Acid..."
             placeholderTextColor={Colors.textLight}
             value={text}
             onChangeText={setText}
@@ -87,14 +87,14 @@ export const ManualEntryScreen = ({ navigation }) => {
 
         <TouchableOpacity onPress={handlePasteExample} style={styles.exampleButton} disabled={loading}>
           <Ionicons name="clipboard-outline" size={18} color={Colors.primary} />
-          <Text style={styles.exampleText}>Paste example ingredients</Text>
+          <Text style={styles.exampleText}>Örnek içerikleri yapıştır</Text>
         </TouchableOpacity>
 
         {text.length > 0 && (
           <View style={styles.countContainer}>
             <Ionicons name="flask-outline" size={16} color={Colors.textSecondary} />
             <Text style={styles.countText}>
-              {parseIngredients(text).length} ingredients detected
+              {parseIngredients(text).length} içerik algılandı
             </Text>
           </View>
         )}
@@ -104,11 +104,11 @@ export const ManualEntryScreen = ({ navigation }) => {
         {loading ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="small" color={Colors.primary} />
-            <Text style={styles.loadingText}>Analyzing...</Text>
+            <Text style={styles.loadingText}>Analiz ediliyor...</Text>
           </View>
         ) : (
           <GradientButton
-            title="Analyze Ingredients"
+            title="İçerikleri Analiz Et"
             onPress={handleAnalyze}
             style={[!text.trim() && styles.buttonDisabled]}
           />

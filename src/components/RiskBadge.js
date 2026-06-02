@@ -4,17 +4,17 @@ import { Colors, Typography } from '../constants';
 
 const riskConfig = {
   safe: {
-    label: 'Safe',
+    label: 'Güvenli',
     color: Colors.safe,
     bgColor: Colors.safeBg,
   },
   medium: {
-    label: 'Medium Risk',
+    label: 'Dikkatli Kullan',
     color: Colors.mediumRisk,
     bgColor: Colors.mediumRiskBg,
   },
   unsafe: {
-    label: 'Unsafe',
+    label: 'Riskli',
     color: Colors.unsafe,
     bgColor: Colors.unsafeBg,
   },

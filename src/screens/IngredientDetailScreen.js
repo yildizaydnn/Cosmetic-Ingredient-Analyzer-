@@ -21,7 +21,7 @@ export const IngredientDetailScreen = ({ route, navigation }) => {
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color={Colors.textPrimary} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Ingredient Details</Text>
+        <Text style={styles.headerTitle}>İçerik Detayı</Text>
         <View style={{ width: 40 }} />
       </View>
 
@@ -37,7 +37,7 @@ export const IngredientDetailScreen = ({ route, navigation }) => {
             <View style={{ flex: 1 }}>
               <Text style={styles.ingredientName}>{ingredient.name}</Text>
               {ingredient.matchedAs && (
-                <Text style={styles.matchedAs}>Matched as: {ingredient.matchedAs}</Text>
+                <Text style={styles.matchedAs}>Eşleşme: {ingredient.matchedAs}</Text>
               )}
               <View style={styles.badges}>
                 <RiskBadge riskLevel={ingredient.riskLevel} style={styles.riskBadgeOverride} />
@@ -62,15 +62,15 @@ export const IngredientDetailScreen = ({ route, navigation }) => {
           <View style={styles.card}>
             <View style={styles.cardHeader}>
               <Ionicons name="list-outline" size={22} color={Colors.primary} />
-              <Text style={styles.cardTitle}>Position in Formula</Text>
+              <Text style={styles.cardTitle}>Formüldeki Sırası</Text>
             </View>
             <Text style={styles.cardBody}>
-              #{ingredient.position} in the ingredient list
+              İçerik listesinde #{ingredient.position}. sırada
               {ingredient.positionWeight >= 1.0
-                ? ' — High concentration'
+                ? ' — Yüksek konsantrasyon'
                 : ingredient.positionWeight >= 0.5
-                ? ' — Medium concentration'
-                : ' — Low concentration'}
+                ? ' — Orta konsantrasyon'
+                : ' — Düşük konsantrasyon'}
             </Text>
           </View>
         )}
@@ -80,7 +80,7 @@ export const IngredientDetailScreen = ({ route, navigation }) => {
           <View style={styles.card}>
             <View style={styles.cardHeader}>
               <Ionicons name="information-circle-outline" size={22} color={Colors.primary} />
-              <Text style={styles.cardTitle}>What is it?</Text>
+              <Text style={styles.cardTitle}>Nedir?</Text>
             </View>
             <Text style={styles.cardBody}>{ingredient.description}</Text>
           </View>
@@ -92,7 +92,7 @@ export const IngredientDetailScreen = ({ route, navigation }) => {
             <View style={styles.cardHeader}>
               <Ionicons name="warning-outline" size={22} color={Colors.mediumRisk} />
               <Text style={styles.cardTitle}>
-                Why {ingredient.riskLevel === 'unsafe' ? 'Unsafe' : 'Medium Risk'}?
+                Neden {ingredient.riskLevel === 'unsafe' ? 'Riskli' : 'Dikkatli Kullanılmalı'}?
               </Text>
             </View>
             <Text style={styles.cardBody}>{ingredient.whyRisk}</Text>
@@ -104,7 +104,7 @@ export const IngredientDetailScreen = ({ route, navigation }) => {
           <View style={styles.card}>
             <View style={styles.cardHeader}>
               <Ionicons name="help-circle-outline" size={22} color={Colors.textLight} />
-              <Text style={styles.cardTitle}>Note</Text>
+              <Text style={styles.cardTitle}>Not</Text>
             </View>
             <Text style={styles.cardBody}>{ingredient.note}</Text>
           </View>
@@ -114,7 +114,7 @@ export const IngredientDetailScreen = ({ route, navigation }) => {
         {ingredient.recommendation && (
           <View style={styles.recommendationCard}>
             <Text style={styles.recommendationText}>
-              <Text style={styles.recommendationLabel}>Recommendation: </Text>
+              <Text style={styles.recommendationLabel}>Öneri: </Text>
               {ingredient.recommendation}
             </Text>
           </View>

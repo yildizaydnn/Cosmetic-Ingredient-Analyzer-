@@ -32,8 +32,8 @@ export const LoginScreen = ({ navigation }) => {
     >
       <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
         <View style={styles.header}>
-          <Text style={styles.title}>Welcome Back</Text>
-          <Text style={styles.subtitle}>Sign in to continue</Text>
+          <Text style={styles.title}>Tekrar Hoş Geldiniz</Text>
+          <Text style={styles.subtitle}>Devam etmek için giriş yapın</Text>
         </View>
 
         <View style={styles.form}>
@@ -41,7 +41,7 @@ export const LoginScreen = ({ navigation }) => {
             <Ionicons name="mail-outline" size={20} color={Colors.textLight} style={styles.inputIcon} />
             <TextInput
               style={styles.input}
-              placeholder="Email address"
+              placeholder="E-posta adresi"
               placeholderTextColor={Colors.textLight}
               value={email}
               onChangeText={setEmail}
@@ -54,7 +54,7 @@ export const LoginScreen = ({ navigation }) => {
             <Ionicons name="lock-closed-outline" size={20} color={Colors.textLight} style={styles.inputIcon} />
             <TextInput
               style={styles.input}
-              placeholder="Password"
+              placeholder="Şifre"
               placeholderTextColor={Colors.textLight}
               value={password}
               onChangeText={setPassword}
@@ -63,15 +63,15 @@ export const LoginScreen = ({ navigation }) => {
           </View>
 
           <TouchableOpacity style={styles.forgotPassword}>
-            <Text style={styles.forgotPasswordText}>Forgot password?</Text>
+            <Text style={styles.forgotPasswordText}>Şifremi unuttum</Text>
           </TouchableOpacity>
 
-          <GradientButton title="Login" onPress={handleLogin} />
+          <GradientButton title="Giriş Yap" onPress={handleLogin} />
         </View>
 
         <View style={styles.divider}>
           <View style={styles.dividerLine} />
-          <Text style={styles.dividerText}>Or continue with</Text>
+          <Text style={styles.dividerText}>veya şununla devam et</Text>
           <View style={styles.dividerLine} />
         </View>
 
@@ -82,9 +82,9 @@ export const LoginScreen = ({ navigation }) => {
         </View>
 
         <View style={styles.footer}>
-          <Text style={styles.footerText}>Don't have an account? </Text>
+          <Text style={styles.footerText}>Hesabınız yok mu? </Text>
           <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
-            <Text style={styles.signUpText}>Sign up</Text>
+            <Text style={styles.signUpText}>Kayıt ol</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

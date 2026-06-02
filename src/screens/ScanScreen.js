@@ -20,11 +20,11 @@ export const ScanScreen = ({ navigation }) => {
 
     } catch (error) {
       Alert.alert(
-        'Analysis Failed',
-        error.message || 'Could not analyze the image. Please try again or enter ingredients manually.',
+        'Analiz Başarısız',
+        error.message || 'Görsel analiz edilemedi. Tekrar deneyin veya içerikleri manuel girin.',
         [
-          { text: 'OK' },
-          { text: 'Manual Entry', onPress: () => navigation.navigate('ManualEntry') },
+          { text: 'Tamam' },
+          { text: 'Manuel Giriş', onPress: () => navigation.navigate('ManualEntry') },
         ]
       );
     } finally {
@@ -37,7 +37,7 @@ export const ScanScreen = ({ navigation }) => {
 
     const permission = await ImagePicker.requestCameraPermissionsAsync();
     if (!permission.granted) {
-      Alert.alert('Permission Required', 'Camera access is needed to scan ingredients.');
+      Alert.alert('İzin Gerekli', 'İçerikleri taramak için kamera erişimi gereklidir.');
       return;
     }
 
@@ -68,8 +68,8 @@ export const ScanScreen = ({ navigation }) => {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={Colors.primary} />
-        <Text style={styles.loadingText}>Analyzing ingredients...</Text>
-        <Text style={styles.loadingSubtext}>This may take a few seconds</Text>
+        <Text style={styles.loadingText}>İçerikler analiz ediliyor...</Text>
+        <Text style={styles.loadingSubtext}>Bu birkaç saniye sürebilir</Text>
       </View>
     );
   }
@@ -80,13 +80,13 @@ export const ScanScreen = ({ navigation }) => {
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color={Colors.textPrimary} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Scan Product</Text>
+        <Text style={styles.headerTitle}>Ürün Tara</Text>
         <View style={{ width: 40 }} />
       </View>
 
       <View style={styles.content}>
         <Text style={styles.subtitle}>
-          Take a photo of the ingredient list or pick from gallery
+          İçerik listesinin fotoğrafını çekin veya galeriden seçin
         </Text>
 
         <TouchableOpacity style={styles.optionCard} onPress={handleCamera} activeOpacity={0.7}>
@@ -97,8 +97,8 @@ export const ScanScreen = ({ navigation }) => {
             end={{ x: 1, y: 0 }}
           >
             <Ionicons name="camera" size={40} color={Colors.textWhite} />
-            <Text style={styles.optionTitle}>Take Photo</Text>
-            <Text style={styles.optionHint}>Use your camera to capture the ingredient label</Text>
+            <Text style={styles.optionTitle}>Fotoğraf Çek</Text>
+            <Text style={styles.optionHint}>Kameranızla içerik etiketini çekin</Text>
           </LinearGradient>
         </TouchableOpacity>
 
@@ -110,8 +110,8 @@ export const ScanScreen = ({ navigation }) => {
             end={{ x: 1, y: 0 }}
           >
             <Ionicons name="images" size={40} color={Colors.textWhite} />
-            <Text style={styles.optionTitle}>Pick from Gallery</Text>
-            <Text style={styles.optionHint}>Select an existing photo of the ingredient list</Text>
+            <Text style={styles.optionTitle}>Galeriden Seç</Text>
+            <Text style={styles.optionHint}>Mevcut bir içerik listesi fotoğrafı seçin</Text>
           </LinearGradient>
         </TouchableOpacity>
 
@@ -120,7 +120,7 @@ export const ScanScreen = ({ navigation }) => {
           onPress={() => navigation.navigate('ManualEntry')}
         >
           <Ionicons name="create-outline" size={20} color={Colors.primary} />
-          <Text style={styles.manualText}>Enter ingredients manually</Text>
+          <Text style={styles.manualText}>İçerikleri manuel girin</Text>
         </TouchableOpacity>
       </View>
     </View>

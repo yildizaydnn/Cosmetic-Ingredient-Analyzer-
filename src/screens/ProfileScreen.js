@@ -6,10 +6,10 @@ import { useAuth } from '../context/AuthContext';
 
 const skinTypeLabels = {
   normal: 'Normal',
-  dry: 'Dry',
-  oily: 'Oily',
-  combination: 'Combination',
-  sensitive: 'Sensitive',
+  dry: 'Kuru',
+  oily: 'Yağlı',
+  combination: 'Karma',
+  sensitive: 'Hassas',
 };
 
 const MenuItem = ({ icon, label, onPress, color, showArrow = true }) => (
@@ -28,7 +28,7 @@ export const ProfileScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Profile</Text>
+        <Text style={styles.title}>Profil</Text>
       </View>
 
       <View style={styles.profileCard}>
@@ -43,30 +43,30 @@ export const ProfileScreen = ({ navigation }) => {
 
       <View style={styles.skinTypeCard}>
         <View>
-          <Text style={styles.skinTypeLabel}>Skin Type</Text>
+          <Text style={styles.skinTypeLabel}>Cilt Tipi</Text>
           <Text style={styles.skinTypeValue}>
-            {skinType ? skinTypeLabels[skinType] : 'Not set'}
+            {skinType ? skinTypeLabels[skinType] : 'Seçilmedi'}
           </Text>
         </View>
         <TouchableOpacity
           onPress={() => navigation.navigate('SkinType')}
           style={styles.editButton}
         >
-          <Text style={styles.editButtonText}>Change</Text>
+          <Text style={styles.editButtonText}>Değiştir</Text>
         </TouchableOpacity>
       </View>
 
       <View style={styles.menu}>
-        <MenuItem icon="notifications-outline" label="Notifications" color={Colors.primary} />
-        <MenuItem icon="shield-outline" label="Privacy" color={Colors.secondary} />
-        <MenuItem icon="help-circle-outline" label="Help & Support" color={Colors.primary} />
-        <MenuItem icon="information-circle-outline" label="About" color={Colors.textSecondary} />
+        <MenuItem icon="notifications-outline" label="Bildirimler" color={Colors.primary} />
+        <MenuItem icon="shield-outline" label="Gizlilik" color={Colors.secondary} />
+        <MenuItem icon="help-circle-outline" label="Yardım ve Destek" color={Colors.primary} />
+        <MenuItem icon="information-circle-outline" label="Hakkında" color={Colors.textSecondary} />
       </View>
 
       <View style={styles.logoutSection}>
         <MenuItem
           icon="log-out-outline"
-          label="Log Out"
+          label="Çıkış Yap"
           color={Colors.unsafe}
           onPress={logout}
           showArrow={false}

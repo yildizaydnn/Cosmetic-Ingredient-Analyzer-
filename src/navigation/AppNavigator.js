@@ -22,10 +22,10 @@ const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
 const tabIconMap = {
-  Home: { focused: 'home', unfocused: 'home-outline' },
-  Scan: { focused: 'scan-circle', unfocused: 'scan-circle-outline' },
-  History: { focused: 'time', unfocused: 'time-outline' },
-  Profile: { focused: 'person', unfocused: 'person-outline' },
+  'Ana Sayfa': { focused: 'home', unfocused: 'home-outline' },
+  Tara: { focused: 'scan-circle', unfocused: 'scan-circle-outline' },
+  'Geçmiş': { focused: 'time', unfocused: 'time-outline' },
+  Profil: { focused: 'person', unfocused: 'person-outline' },
 };
 
 const MainTabs = () => (
@@ -62,10 +62,10 @@ const MainTabs = () => (
       },
     })}
   >
-    <Tab.Screen name="Home" component={HomeScreen} />
-    <Tab.Screen name="Scan" component={ScanScreen} />
-    <Tab.Screen name="History" component={HistoryScreen} />
-    <Tab.Screen name="Profile" component={ProfileScreen} />
+    <Tab.Screen name="Ana Sayfa" component={HomeScreen} />
+    <Tab.Screen name="Tara" component={ScanScreen} />
+    <Tab.Screen name="Geçmiş" component={HistoryScreen} />
+    <Tab.Screen name="Profil" component={ProfileScreen} />
   </Tab.Navigator>
 );
 

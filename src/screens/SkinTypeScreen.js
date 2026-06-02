@@ -6,11 +6,11 @@ import { GradientButton } from '../components/GradientButton';
 import { useAuth } from '../context/AuthContext';
 
 const skinTypes = [
-  { key: 'normal', label: 'Normal', icon: 'happy-outline', description: 'Balanced, not too oily or dry' },
-  { key: 'dry', label: 'Dry', icon: 'water-outline', description: 'Feels tight, may flake or crack' },
-  { key: 'oily', label: 'Oily', icon: 'sunny-outline', description: 'Shiny, enlarged pores, prone to acne' },
-  { key: 'combination', label: 'Combination', icon: 'contrast-outline', description: 'Oily T-zone, dry cheeks' },
-  { key: 'sensitive', label: 'Sensitive', icon: 'heart-outline', description: 'Easily irritated, redness, stinging' },
+  { key: 'normal', label: 'Normal', icon: 'happy-outline', description: 'Dengeli, ne çok yağlı ne çok kuru' },
+  { key: 'dry', label: 'Kuru', icon: 'water-outline', description: 'Gergin hissettirir, pullanma ve çatlama olabilir' },
+  { key: 'oily', label: 'Yağlı', icon: 'sunny-outline', description: 'Parlak, geniş gözenekler, akneye meyilli' },
+  { key: 'combination', label: 'Karma', icon: 'contrast-outline', description: 'T-bölge yağlı, yanaklar kuru' },
+  { key: 'sensitive', label: 'Hassas', icon: 'heart-outline', description: 'Kolay tahriş olur, kızarıklık, yanma hissi' },
 ];
 
 export const SkinTypeScreen = () => {
@@ -30,9 +30,9 @@ export const SkinTypeScreen = () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>What's your skin type?</Text>
+        <Text style={styles.title}>Cilt tipiniz nedir?</Text>
         <Text style={styles.subtitle}>
-          This helps us analyze ingredients based on your skin's needs
+          Bu, içerikleri cilt ihtiyaçlarınıza göre analiz etmemize yardımcı olur
         </Text>
       </View>
 
@@ -68,7 +68,7 @@ export const SkinTypeScreen = () => {
       </View>
 
       <GradientButton
-        title="Continue"
+        title="Devam Et"
         onPress={handleContinue}
         style={[styles.button, !selected && styles.buttonDisabled]}
       />

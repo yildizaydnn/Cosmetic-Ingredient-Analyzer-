@@ -28,18 +28,18 @@ export const HistoryScreen = ({ navigation }) => {
           <View style={styles.stats}>
             <View style={styles.stat}>
               <View style={[styles.statDot, { backgroundColor: Colors.safe }]} />
-              <Text style={styles.statText}>{item.safeCount} safe</Text>
+              <Text style={styles.statText}>{item.safeCount} güvenli</Text>
             </View>
             {item.mediumCount > 0 && (
               <View style={styles.stat}>
                 <View style={[styles.statDot, { backgroundColor: Colors.mediumRisk }]} />
-                <Text style={styles.statText}>{item.mediumCount} medium</Text>
+                <Text style={styles.statText}>{item.mediumCount} dikkat</Text>
               </View>
             )}
             {item.unsafeCount > 0 && (
               <View style={styles.stat}>
                 <View style={[styles.statDot, { backgroundColor: Colors.unsafe }]} />
-                <Text style={styles.statText}>{item.unsafeCount} unsafe</Text>
+                <Text style={styles.statText}>{item.unsafeCount} riskli</Text>
               </View>
             )}
           </View>
@@ -52,7 +52,7 @@ export const HistoryScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>History</Text>
+        <Text style={styles.title}>Geçmiş</Text>
       </View>
       <FlatList
         data={mockHistory}
@@ -63,9 +63,9 @@ export const HistoryScreen = ({ navigation }) => {
         ListEmptyComponent={
           <View style={styles.empty}>
             <Ionicons name="time-outline" size={48} color={Colors.textLight} />
-            <Text style={styles.emptyText}>No analysis history yet</Text>
+            <Text style={styles.emptyText}>Henüz analiz geçmişi yok</Text>
             <Text style={styles.emptySubtext}>
-              Start by scanning or entering product ingredients
+              Ürün içeriklerini tarayarak veya girerek başlayın
             </Text>
           </View>
         }

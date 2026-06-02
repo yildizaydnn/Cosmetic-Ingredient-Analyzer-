@@ -32,8 +32,8 @@ export const SignUpScreen = ({ navigation }) => {
     >
       <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
         <View style={styles.header}>
-          <Text style={styles.title}>Create Account</Text>
-          <Text style={styles.subtitle}>Sign up to get started</Text>
+          <Text style={styles.title}>Hesap Oluştur</Text>
+          <Text style={styles.subtitle}>Başlamak için kayıt olun</Text>
         </View>
 
         <View style={styles.form}>
@@ -41,7 +41,7 @@ export const SignUpScreen = ({ navigation }) => {
             <Ionicons name="person-outline" size={20} color={Colors.textLight} style={styles.inputIcon} />
             <TextInput
               style={styles.input}
-              placeholder="Full name"
+              placeholder="Ad Soyad"
               placeholderTextColor={Colors.textLight}
               value={name}
               onChangeText={setName}
@@ -52,7 +52,7 @@ export const SignUpScreen = ({ navigation }) => {
             <Ionicons name="mail-outline" size={20} color={Colors.textLight} style={styles.inputIcon} />
             <TextInput
               style={styles.input}
-              placeholder="Email address"
+              placeholder="E-posta adresi"
               placeholderTextColor={Colors.textLight}
               value={email}
               onChangeText={setEmail}
@@ -65,7 +65,7 @@ export const SignUpScreen = ({ navigation }) => {
             <Ionicons name="lock-closed-outline" size={20} color={Colors.textLight} style={styles.inputIcon} />
             <TextInput
               style={styles.input}
-              placeholder="Password"
+              placeholder="Şifre"
               placeholderTextColor={Colors.textLight}
               value={password}
               onChangeText={setPassword}
@@ -73,13 +73,13 @@ export const SignUpScreen = ({ navigation }) => {
             />
           </View>
 
-          <GradientButton title="Sign Up" onPress={handleSignUp} style={{ marginTop: 8 }} />
+          <GradientButton title="Kayıt Ol" onPress={handleSignUp} style={{ marginTop: 8 }} />
         </View>
 
         <View style={styles.footer}>
-          <Text style={styles.footerText}>Already have an account? </Text>
+          <Text style={styles.footerText}>Zaten hesabınız var mı? </Text>
           <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Text style={styles.loginText}>Login</Text>
+            <Text style={styles.loginText}>Giriş yap</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

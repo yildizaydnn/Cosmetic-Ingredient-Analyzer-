@@ -24,9 +24,9 @@ export const WelcomeScreen = ({ navigation }) => {
             <Ionicons name="sparkles" size={40} color={Colors.primary} />
           </View>
         </View>
-        <Text style={styles.title}>Welcome to Cosmetic{'\n'}Ingredient Analyzer</Text>
+        <Text style={styles.title}>Kozmetik İçerik{'\n'}Analizörüne Hoş Geldiniz</Text>
         <Text style={styles.subtitle}>
-          Scan or enter product ingredients and learn how safe they are.
+          Ürün içeriklerini tarayın veya girin, cilt tipinize uygunluğunu öğrenin.
         </Text>
       </View>
 
