@@ -49,7 +49,7 @@ export const ProfileScreen = ({ navigation }) => {
           </Text>
         </View>
         <TouchableOpacity
-          onPress={() => navigation.navigate('SkinType')}
+          onPress={() => navigation.navigate('EditSkinType')}
           style={styles.editButton}
         >
           <Text style={styles.editButtonText}>Değiştir</Text>
@@ -58,7 +58,7 @@ export const ProfileScreen = ({ navigation }) => {
 
       <View style={styles.menu}>
         <MenuItem icon="notifications-outline" label="Bildirimler" color={Colors.primary} />
-        <MenuItem icon="shield-outline" label="Gizlilik" color={Colors.secondary} />
+        <MenuItem icon="shield-outline" label="Gizlilik" color={Colors.secondary} onPress={() => navigation.navigate('Privacy')} />
         <MenuItem icon="help-circle-outline" label="Yardım ve Destek" color={Colors.primary} />
         <MenuItem icon="information-circle-outline" label="Hakkında" color={Colors.textSecondary} />
       </View>

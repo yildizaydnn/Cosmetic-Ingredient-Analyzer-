@@ -17,6 +17,7 @@ import { AnalysisResultScreen } from '../screens/AnalysisResultScreen';
 import { IngredientDetailScreen } from '../screens/IngredientDetailScreen';
 import { HistoryScreen } from '../screens/HistoryScreen';
 import { ProfileScreen } from '../screens/ProfileScreen';
+import { PrivacyScreen } from '../screens/PrivacyScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -96,6 +97,7 @@ export const AppNavigator = () => {
           <Stack.Screen name="AnalysisResult" component={AnalysisResultScreen} />
           <Stack.Screen name="IngredientDetail" component={IngredientDetailScreen} />
           <Stack.Screen name="EditSkinType" component={SkinTypeScreen} />
+          <Stack.Screen name="Privacy" component={PrivacyScreen} />
         </>
       )}
     </Stack.Navigator>

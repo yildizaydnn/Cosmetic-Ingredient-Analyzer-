@@ -13,14 +13,16 @@ const skinTypes = [
   { key: 'sensitive', label: 'Hassas', icon: 'heart-outline', description: 'Kolay tahriş olur, kızarıklık, yanma hissi' },
 ];
 
-export const SkinTypeScreen = () => {
-  const [selected, setSelected] = useState(null);
-  const { updateSkinType } = useAuth();
+export const SkinTypeScreen = ({ navigation, route }) => {
+  const { skinType: currentSkinType, updateSkinType } = useAuth();
+  const isEditing = route?.name === 'EditSkinType';
+  const [selected, setSelected] = useState(isEditing ? currentSkinType : null);
 
   const handleContinue = async () => {
     if (selected) {
       try {
         await updateSkinType(selected);
+        if (isEditing) navigation.goBack();
       } catch (e) {
         console.error('SkinType update failed:', e);
       }
@@ -29,8 +31,13 @@ export const SkinTypeScreen = () => {
 
   return (
     <View style={styles.container}>
+      {isEditing && (
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+          <Ionicons name="arrow-back" size={24} color={Colors.textPrimary} />
+        </TouchableOpacity>
+      )}
       <View style={styles.header}>
-        <Text style={styles.title}>Cilt tipiniz nedir?</Text>
+        <Text style={styles.title}>{isEditing ? 'Cilt Tipini Değiştir' : 'Cilt tipiniz nedir?'}</Text>
         <Text style={styles.subtitle}>
           Bu, içerikleri cilt ihtiyaçlarınıza göre analiz etmemize yardımcı olur
         </Text>
@@ -68,7 +75,7 @@ export const SkinTypeScreen = () => {
       </View>
 
       <GradientButton
-        title="Devam Et"
+        title={isEditing ? 'Kaydet' : 'Devam Et'}
         onPress={handleContinue}
         style={[styles.button, !selected && styles.buttonDisabled]}
       />
@@ -83,6 +90,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingTop: 60,
     paddingBottom: 40,
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 8,
   },
   header: {
     marginBottom: 32,
