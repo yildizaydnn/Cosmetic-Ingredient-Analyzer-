@@ -1,7 +1,25 @@
 import { Platform } from 'react-native';
+import Constants from 'expo-constants';
 
-// Fiziksel cihazdan erişim için bilgisayarın local IP'si
-const BASE_URL = 'http://192.168.1.7:8000';
+function getBaseUrl() {
+  // Expo debuggerHost'tan bilgisayarın IP'sini otomatik al
+  const debuggerHost =
+    Constants.expoConfig?.hostUri ||
+    Constants.manifest2?.extra?.expoGo?.debuggerHost ||
+    Constants.manifest?.debuggerHost;
+
+  if (debuggerHost) {
+    const ip = debuggerHost.split(':')[0];
+    return `http://${ip}:8000`;
+  }
+
+  // Fallback
+  if (Platform.OS === 'android') return 'http://10.0.2.2:8000';
+  return 'http://localhost:8000';
+}
+
+const BASE_URL = getBaseUrl();
+console.log('[API] Base URL:', BASE_URL);
 
 const API_URL = `${BASE_URL}/api/v1`;
 
@@ -85,6 +103,9 @@ export async function analyzeImage(imageUri, skinType, language = 'tr') {
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 120000);
+  const start = Date.now();
+
+  console.log(`[API] analyzeImage → POST ${API_URL}/analyze`);
 
   try {
     const response = await fetch(`${API_URL}/analyze`, {
@@ -93,17 +114,25 @@ export async function analyzeImage(imageUri, skinType, language = 'tr') {
       signal: controller.signal,
     });
 
+    const elapsed = ((Date.now() - start) / 1000).toFixed(1);
+    console.log(`[API] analyzeImage ← ${response.status} (${elapsed}s)`);
+
     if (!response.ok) {
       const error = await response.json().catch(() => ({}));
+      console.log(`[API] analyzeImage ERROR:`, error.detail || response.status);
       throw new Error(error.detail || `Server error: ${response.status}`);
     }
 
     const data = await response.json();
+    console.log(`[API] analyzeImage OK: ${data.total_ingredients} ingredients`);
     return mapAnalysisResponse(data);
   } catch (error) {
+    const elapsed = ((Date.now() - start) / 1000).toFixed(1);
     if (error.name === 'AbortError') {
+      console.log(`[API] analyzeImage TIMEOUT after ${elapsed}s`);
       throw new Error('Analiz zaman aşımına uğradı. Lütfen tekrar deneyin.');
     }
+    console.log(`[API] analyzeImage FAIL after ${elapsed}s:`, error.message);
     throw error;
   } finally {
     clearTimeout(timeout);
@@ -112,6 +141,9 @@ export async function analyzeImage(imageUri, skinType, language = 'tr') {
 
 // Metin ile analiz
 export async function analyzeText(ingredientsText, skinType, language = 'tr') {
+  const start = Date.now();
+  console.log(`[API] analyzeText → POST ${API_URL}/analyze-text`);
+
   const response = await fetch(`${API_URL}/analyze-text`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -122,12 +154,17 @@ export async function analyzeText(ingredientsText, skinType, language = 'tr') {
     }),
   });
 
+  const elapsed = ((Date.now() - start) / 1000).toFixed(1);
+  console.log(`[API] analyzeText ← ${response.status} (${elapsed}s)`);
+
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
+    console.log(`[API] analyzeText ERROR:`, error.detail || response.status);
     throw new Error(error.detail || `Server error: ${response.status}`);
   }
 
   const data = await response.json();
+  console.log(`[API] analyzeText OK: ${data.total_ingredients} ingredients`);
   return mapAnalysisResponse(data);
 }
 
