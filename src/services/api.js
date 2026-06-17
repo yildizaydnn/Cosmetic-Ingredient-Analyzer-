@@ -80,6 +80,8 @@ function mapAnalysisResponse(data) {
   ingredients.sort((a, b) => (a.position || 0) - (b.position || 0));
 
   return {
+    isCosmetic: data.is_cosmetic !== false,
+    rejectionReason: data.rejection_reason || null,
     skinType: data.skin_type,
     totalIngredients: data.total_ingredients,
     summary: data.summary,

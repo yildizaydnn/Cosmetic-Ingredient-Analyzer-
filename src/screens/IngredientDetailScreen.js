@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography } from '../constants';
 import { RiskBadge } from '../components/RiskBadge';
+import { useBadges } from '../context/BadgeContext';
 
 const riskColors = {
   safe: { gradient: [Colors.safe, '#16A34A'], icon: 'shield-checkmark' },
@@ -14,6 +15,15 @@ const riskColors = {
 export const IngredientDetailScreen = ({ route, navigation }) => {
   const { ingredient } = route.params;
   const risk = riskColors[ingredient.riskLevel] || riskColors.medium;
+  const { onDetailView } = useBadges();
+  const tracked = useRef(false);
+
+  useEffect(() => {
+    if (!tracked.current) {
+      tracked.current = true;
+      onDetailView();
+    }
+  }, []);
 
   return (
     <View style={styles.container}>

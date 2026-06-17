@@ -16,6 +16,13 @@ export const ScanScreen = ({ navigation }) => {
     try {
       setProcessing(true);
       const result = await analyzeImage(imageUri, skinType);
+      if (!result.isCosmetic) {
+        Alert.alert(
+          'Kozmetik Ürün Değil',
+          result.rejectionReason || 'Bu içerik listesi bir cilt bakım ürününe ait görünmüyor.',
+        );
+        return;
+      }
       navigation.navigate('AnalysisResult', { analysisResult: result });
     } catch (error) {
       Alert.alert(

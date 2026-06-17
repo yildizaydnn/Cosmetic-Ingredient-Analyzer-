@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, Modal } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography } from '../constants';
@@ -7,10 +7,12 @@ import { IngredientCard } from '../components/IngredientCard';
 import { analyzeIngredients } from '../services/mockData';
 import { saveAnalysis, updateHistoryItem } from '../services/historyStorage';
 import { useAuth } from '../context/AuthContext';
+import { useBadges } from '../context/BadgeContext';
 
 export const AnalysisResultScreen = ({ route, navigation }) => {
   const params = route.params;
   const { skinType } = useAuth();
+  const { onAnalysisComplete, newBadge, dismissBadgeNotification } = useBadges();
   const saved = useRef(false);
   const savedId = useRef(null);
   const [editing, setEditing] = useState(false);
@@ -52,6 +54,7 @@ export const AnalysisResultScreen = ({ route, navigation }) => {
   useEffect(() => {
     if (!saved.current && ingredients && summary) {
       saved.current = true;
+      const source = params.source || 'scan';
       saveAnalysis({
         productName: productName || null,
         ingredients,
@@ -61,6 +64,7 @@ export const AnalysisResultScreen = ({ route, navigation }) => {
       }).then((entry) => {
         savedId.current = entry.id;
       }).catch(() => {});
+      onAnalysisComplete(summary, source);
     }
   }, []);
 
@@ -74,9 +78,12 @@ export const AnalysisResultScreen = ({ route, navigation }) => {
   const safeCount = summary.beneficial_count + summary.neutral_count;
   const mediumCount = summary.caution_count + summary.unknown_count;
 
+  const total = ingredients.length || 1;
+  const riskRatio = mediumCount / total;
+
   const overallStatus =
-    mediumCount > ingredients.length / 2 ? 'unsafe' :
-    mediumCount > 0 ? 'medium' : 'safe';
+    riskRatio > 0.4 ? 'unsafe' :
+    riskRatio > 0.15 ? 'medium' : 'safe';
 
   const statusConfig = {
     safe: { label: 'Güvenli Ürün', color: Colors.safe, icon: 'shield-checkmark' },
@@ -193,6 +200,23 @@ export const AnalysisResultScreen = ({ route, navigation }) => {
 
         <View style={{ height: 30 }} />
       </ScrollView>
+
+      {/* Rozet Kazanma Bildirimi */}
+      <Modal visible={!!newBadge} transparent animationType="fade">
+        <View style={styles.badgeModalOverlay}>
+          <View style={styles.badgeModalContent}>
+            <View style={[styles.badgeModalIcon, { backgroundColor: newBadge?.color + '20' }]}>
+              <Ionicons name={newBadge?.icon} size={48} color={newBadge?.color} />
+            </View>
+            <Text style={styles.badgeModalTitle}>Rozet Kazandın!</Text>
+            <Text style={styles.badgeModalName}>{newBadge?.title}</Text>
+            <Text style={styles.badgeModalDesc}>{newBadge?.description}</Text>
+            <TouchableOpacity style={styles.badgeModalButton} onPress={dismissBadgeNotification}>
+              <Text style={styles.badgeModalButtonText}>Harika!</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -340,5 +364,58 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     flex: 1,
     lineHeight: 18,
+  },
+  badgeModalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  badgeModalContent: {
+    backgroundColor: Colors.white,
+    borderRadius: 24,
+    padding: 32,
+    alignItems: 'center',
+    marginHorizontal: 40,
+    width: 300,
+  },
+  badgeModalIcon: {
+    width: 88,
+    height: 88,
+    borderRadius: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+  },
+  badgeModalTitle: {
+    ...Typography.caption,
+    color: Colors.primary,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+  },
+  badgeModalName: {
+    ...Typography.h2,
+    color: Colors.textPrimary,
+    marginTop: 4,
+    textAlign: 'center',
+  },
+  badgeModalDesc: {
+    ...Typography.body,
+    color: Colors.textSecondary,
+    textAlign: 'center',
+    marginTop: 8,
+  },
+  badgeModalButton: {
+    backgroundColor: Colors.primary,
+    borderRadius: 14,
+    paddingVertical: 12,
+    paddingHorizontal: 40,
+    marginTop: 24,
+  },
+  badgeModalButtonText: {
+    ...Typography.subtitle,
+    color: Colors.textWhite,
+    fontWeight: '600',
   },
 });

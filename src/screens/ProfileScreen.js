@@ -1,8 +1,9 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors, Typography } from '../constants';
+import { Colors, Typography, BADGES } from '../constants';
 import { useAuth } from '../context/AuthContext';
+import { useBadges } from '../context/BadgeContext';
 
 const skinTypeLabels = {
   normal: 'Normal',
@@ -24,9 +25,20 @@ const MenuItem = ({ icon, label, onPress, color, showArrow = true }) => (
 
 export const ProfileScreen = ({ navigation }) => {
   const { user, skinType, logout } = useAuth();
+  const { earnedBadges, stats } = useBadges();
+
+  const earnedIds = new Set(earnedBadges.map((b) => b.id));
+  const earnedCount = earnedBadges.length;
+  const totalCount = BADGES.length;
+
+  // Son kazanılan 4 rozeti göster
+  const recentEarned = BADGES.filter((b) => earnedIds.has(b.id)).slice(0, 4);
+  // Kilitli rozetlerden ilk birkaçını göster
+  const locked = BADGES.filter((b) => !earnedIds.has(b.id)).slice(0, 4 - recentEarned.length);
+  const previewBadges = [...recentEarned, ...locked].slice(0, 4);
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
         <Text style={styles.title}>Profil</Text>
       </View>
@@ -52,27 +64,108 @@ export const ProfileScreen = ({ navigation }) => {
           onPress={() => navigation.navigate('EditSkinType')}
           style={styles.editButton}
         >
-          <Text style={styles.editButtonText}>Değiştir</Text>
+          <Text style={styles.editButtonText}>Degistir</Text>
         </TouchableOpacity>
       </View>
+
+      {/* Rozet Bölümü */}
+      <TouchableOpacity
+        style={styles.badgeSection}
+        activeOpacity={0.7}
+        onPress={() => navigation.navigate('Badges')}
+      >
+        <View style={styles.badgeSectionHeader}>
+          <View>
+            <Text style={styles.badgeSectionTitle}>Rozetlerim</Text>
+            <Text style={styles.badgeSectionCount}>
+              {earnedCount}/{totalCount} rozet kazanildi
+            </Text>
+          </View>
+          <Ionicons name="chevron-forward" size={20} color={Colors.textLight} />
+        </View>
+
+        {/* İlerleme çubuğu */}
+        <View style={styles.progressBar}>
+          <View
+            style={[
+              styles.progressFill,
+              { width: totalCount > 0 ? `${(earnedCount / totalCount) * 100}%` : '0%' },
+            ]}
+          />
+        </View>
+
+        {/* Rozet önizleme */}
+        <View style={styles.badgePreview}>
+          {previewBadges.map((badge) => {
+            const isEarned = earnedIds.has(badge.id);
+            return (
+              <View key={badge.id} style={styles.badgeItem}>
+                <View
+                  style={[
+                    styles.badgeCircle,
+                    {
+                      backgroundColor: isEarned ? badge.color + '20' : Colors.borderLight,
+                    },
+                  ]}
+                >
+                  <Ionicons
+                    name={badge.icon}
+                    size={24}
+                    color={isEarned ? badge.color : Colors.textLight}
+                  />
+                </View>
+                <Text
+                  style={[
+                    styles.badgeLabel,
+                    !isEarned && { color: Colors.textLight },
+                  ]}
+                  numberOfLines={1}
+                >
+                  {badge.title}
+                </Text>
+              </View>
+            );
+          })}
+        </View>
+
+        {/* İstatistikler */}
+        <View style={styles.statsRow}>
+          <View style={styles.statItem}>
+            <Text style={styles.statValue}>{stats.totalScans || 0}</Text>
+            <Text style={styles.statLabel}>Analiz</Text>
+          </View>
+          <View style={styles.statDivider} />
+          <View style={styles.statItem}>
+            <Text style={styles.statValue}>{stats.dailyStreak || 0}</Text>
+            <Text style={styles.statLabel}>Seri</Text>
+          </View>
+          <View style={styles.statDivider} />
+          <View style={styles.statItem}>
+            <Text style={styles.statValue}>{stats.detailViews || 0}</Text>
+            <Text style={styles.statLabel}>Inceleme</Text>
+          </View>
+        </View>
+      </TouchableOpacity>
 
       <View style={styles.menu}>
         <MenuItem icon="notifications-outline" label="Bildirimler" color={Colors.primary} />
         <MenuItem icon="shield-outline" label="Gizlilik" color={Colors.secondary} onPress={() => navigation.navigate('Privacy')} />
-        <MenuItem icon="help-circle-outline" label="Yardım ve Destek" color={Colors.primary} />
-        <MenuItem icon="information-circle-outline" label="Hakkında" color={Colors.textSecondary} />
+        <MenuItem icon="help-circle-outline" label="Yardim ve Destek" color={Colors.primary} />
+        <MenuItem icon="information-circle-outline" label="Hakkinda" color={Colors.textSecondary} />
       </View>
 
       <View style={styles.logoutSection}>
         <MenuItem
           icon="log-out-outline"
-          label="Çıkış Yap"
+          label="Cikis Yap"
           color={Colors.unsafe}
           onPress={logout}
           showArrow={false}
         />
       </View>
-    </View>
+
+      <View style={{ height: 30 }} />
+    </ScrollView>
   );
 };
 
@@ -149,6 +242,87 @@ const styles = StyleSheet.create({
     ...Typography.bodySmall,
     color: Colors.primary,
     fontWeight: '600',
+  },
+  // Rozet bölümü
+  badgeSection: {
+    backgroundColor: Colors.white,
+    marginHorizontal: 20,
+    borderRadius: 16,
+    padding: 18,
+    marginBottom: 14,
+  },
+  badgeSectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  badgeSectionTitle: {
+    ...Typography.h3,
+    color: Colors.textPrimary,
+  },
+  badgeSectionCount: {
+    ...Typography.caption,
+    color: Colors.textSecondary,
+    marginTop: 2,
+  },
+  progressBar: {
+    height: 6,
+    backgroundColor: Colors.borderLight,
+    borderRadius: 3,
+    marginTop: 14,
+    overflow: 'hidden',
+  },
+  progressFill: {
+    height: '100%',
+    backgroundColor: Colors.primary,
+    borderRadius: 3,
+  },
+  badgePreview: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginTop: 18,
+  },
+  badgeItem: {
+    alignItems: 'center',
+    width: 64,
+  },
+  badgeCircle: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  badgeLabel: {
+    ...Typography.caption,
+    color: Colors.textPrimary,
+    marginTop: 6,
+    textAlign: 'center',
+    fontSize: 11,
+  },
+  statsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginTop: 18,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: Colors.borderLight,
+  },
+  statItem: {
+    alignItems: 'center',
+  },
+  statValue: {
+    ...Typography.h3,
+    color: Colors.primary,
+  },
+  statLabel: {
+    ...Typography.caption,
+    color: Colors.textSecondary,
+    marginTop: 2,
+  },
+  statDivider: {
+    width: 1,
+    backgroundColor: Colors.borderLight,
   },
   menu: {
     backgroundColor: Colors.white,

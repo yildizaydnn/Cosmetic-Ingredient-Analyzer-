@@ -36,9 +36,17 @@ export const ManualEntryScreen = ({ navigation }) => {
     try {
       setLoading(true);
       const result = await analyzeText(text, skinType);
+      if (!result.isCosmetic) {
+        Alert.alert(
+          'Kozmetik Ürün Değil',
+          result.rejectionReason || 'Bu içerik listesi bir cilt bakım ürününe ait görünmüyor.',
+        );
+        return;
+      }
       navigation.navigate('AnalysisResult', {
         analysisResult: result,
         productName: productName.trim() || null,
+        source: 'manual',
       });
     } catch (error) {
       Alert.alert(
