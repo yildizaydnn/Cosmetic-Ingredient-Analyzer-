@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, Animated, Easing } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -7,6 +7,128 @@ import { Colors, Typography } from '../constants';
 import { GradientButton } from '../components/GradientButton';
 import { useAuth } from '../context/AuthContext';
 import { analyzeImage } from '../services/api';
+
+const LOADING_STEPS = [
+  { icon: 'camera-outline', text: 'Gorsel okunuyor...' },
+  { icon: 'text-outline', text: 'Icerikler ayiklaniyor...' },
+  { icon: 'flask-outline', text: 'Icerikler analiz ediliyor...' },
+  { icon: 'shield-checkmark-outline', text: 'Sonuclar hazirlaniyor...' },
+];
+
+const LoadingScreen = () => {
+  const [currentStep, setCurrentStep] = useState(0);
+  const spinAnim = useRef(new Animated.Value(0)).current;
+  const fadeAnims = useRef(LOADING_STEPS.map(() => new Animated.Value(0))).current;
+  const progressAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    // Donen animasyon
+    Animated.loop(
+      Animated.timing(spinAnim, {
+        toValue: 1,
+        duration: 2000,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      })
+    ).start();
+
+    // Adim gecisleri
+    const stepTimers = LOADING_STEPS.map((_, i) =>
+      setTimeout(() => {
+        setCurrentStep(i);
+        Animated.timing(fadeAnims[i], {
+          toValue: 1,
+          duration: 400,
+          useNativeDriver: true,
+        }).start();
+        Animated.timing(progressAnim, {
+          toValue: (i + 1) / LOADING_STEPS.length,
+          duration: 500,
+          useNativeDriver: false,
+        }).start();
+      }, i * 8000)
+    );
+
+    // Ilk adimi hemen goster
+    Animated.timing(fadeAnims[0], {
+      toValue: 1,
+      duration: 400,
+      useNativeDriver: true,
+    }).start();
+    Animated.timing(progressAnim, {
+      toValue: 1 / LOADING_STEPS.length,
+      duration: 500,
+      useNativeDriver: false,
+    }).start();
+
+    return () => stepTimers.forEach(clearTimeout);
+  }, []);
+
+  const spin = spinAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '360deg'],
+  });
+
+  const step = LOADING_STEPS[currentStep];
+
+  return (
+    <View style={styles.loadingContainer}>
+      <View style={styles.loadingContent}>
+        {/* Ana icon */}
+        <Animated.View style={[styles.loadingIconWrap, { transform: [{ rotate: spin }] }]}>
+          <LinearGradient
+            colors={[Colors.primary, Colors.secondary]}
+            style={styles.loadingIconCircle}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+          >
+            <View style={styles.loadingIconInner}>
+              <Ionicons name="sparkles" size={32} color={Colors.primary} />
+            </View>
+          </LinearGradient>
+        </Animated.View>
+
+        {/* Aktif adim */}
+        <View style={styles.loadingStepActive}>
+          <Ionicons name={step.icon} size={22} color={Colors.primary} />
+          <Text style={styles.loadingStepText}>{step.text}</Text>
+        </View>
+
+        {/* Progress bar */}
+        <View style={styles.loadingProgressBar}>
+          <Animated.View
+            style={[
+              styles.loadingProgressFill,
+              {
+                width: progressAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: ['0%', '100%'],
+                }),
+              },
+            ]}
+          />
+        </View>
+
+        {/* Adim gostergesi */}
+        <View style={styles.loadingDots}>
+          {LOADING_STEPS.map((_, i) => (
+            <View
+              key={i}
+              style={[
+                styles.loadingDot,
+                i <= currentStep && { backgroundColor: Colors.primary },
+              ]}
+            />
+          ))}
+        </View>
+
+        <Text style={styles.loadingHint}>
+          Bu islem yaklasik 1 dakika surebilir
+        </Text>
+      </View>
+    </View>
+  );
+};
 
 export const ScanScreen = ({ navigation }) => {
   const [processing, setProcessing] = useState(false);
@@ -71,13 +193,7 @@ export const ScanScreen = ({ navigation }) => {
   };
 
   if (processing) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={Colors.primary} />
-        <Text style={styles.loadingText}>İçerikler analiz ediliyor...</Text>
-        <Text style={styles.loadingSubtext}>Görsel okunuyor ve içerikler analiz ediliyor, bu işlem 1 dakika kadar sürebilir</Text>
-      </View>
-    );
+    return <LoadingScreen />;
   }
 
   return (
@@ -208,14 +324,64 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  loadingText: {
+  loadingContent: {
+    alignItems: 'center',
+    paddingHorizontal: 40,
+  },
+  loadingIconWrap: {
+    marginBottom: 32,
+  },
+  loadingIconCircle: {
+    width: 88,
+    height: 88,
+    borderRadius: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  loadingIconInner: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: Colors.white,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  loadingStepActive: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  loadingStepText: {
     ...Typography.h3,
     color: Colors.textPrimary,
-    marginTop: 20,
+    marginLeft: 10,
   },
-  loadingSubtext: {
-    ...Typography.body,
-    color: Colors.textSecondary,
-    marginTop: 8,
+  loadingProgressBar: {
+    width: '100%',
+    height: 6,
+    backgroundColor: Colors.borderLight,
+    borderRadius: 3,
+    overflow: 'hidden',
+    marginBottom: 16,
+  },
+  loadingProgressFill: {
+    height: '100%',
+    backgroundColor: Colors.primary,
+    borderRadius: 3,
+  },
+  loadingDots: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 24,
+  },
+  loadingDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: Colors.borderLight,
+  },
+  loadingHint: {
+    ...Typography.bodySmall,
+    color: Colors.textLight,
   },
 });

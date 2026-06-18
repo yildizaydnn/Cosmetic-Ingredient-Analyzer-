@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -8,7 +8,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Alert,
-  ActivityIndicator,
+  Animated,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography } from '../constants';
@@ -21,6 +21,73 @@ const parseIngredients = (text) => {
     .split(/[,\n]+/)
     .map((i) => i.trim())
     .filter((i) => i.length > 0);
+};
+
+const MANUAL_STEPS = [
+  'Icerikler ayristiriliyor...',
+  'Veritabaninda araniyor...',
+  'Analiz tamamlaniyor...',
+];
+
+const ManualLoadingBar = () => {
+  const [stepIndex, setStepIndex] = useState(0);
+  const progressAnim = useRef(new Animated.Value(0)).current;
+  const pulseAnim = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    // Pulse animasyonu
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseAnim, { toValue: 0.6, duration: 600, useNativeDriver: true }),
+        Animated.timing(pulseAnim, { toValue: 1, duration: 600, useNativeDriver: true }),
+      ])
+    ).start();
+
+    // İlk adım progress
+    Animated.timing(progressAnim, {
+      toValue: 1 / MANUAL_STEPS.length,
+      duration: 400,
+      useNativeDriver: false,
+    }).start();
+
+    // Adım geçişleri
+    const timers = MANUAL_STEPS.slice(1).map((_, i) =>
+      setTimeout(() => {
+        setStepIndex(i + 1);
+        Animated.timing(progressAnim, {
+          toValue: (i + 2) / MANUAL_STEPS.length,
+          duration: 400,
+          useNativeDriver: false,
+        }).start();
+      }, (i + 1) * 5000)
+    );
+
+    return () => timers.forEach(clearTimeout);
+  }, []);
+
+  return (
+    <View style={styles.manualLoadingWrap}>
+      <View style={styles.manualLoadingRow}>
+        <Animated.View style={{ opacity: pulseAnim }}>
+          <Ionicons name="flask" size={20} color={Colors.primary} />
+        </Animated.View>
+        <Text style={styles.manualLoadingText}>{MANUAL_STEPS[stepIndex]}</Text>
+      </View>
+      <View style={styles.manualProgressBar}>
+        <Animated.View
+          style={[
+            styles.manualProgressFill,
+            {
+              width: progressAnim.interpolate({
+                inputRange: [0, 1],
+                outputRange: ['0%', '100%'],
+              }),
+            },
+          ]}
+        />
+      </View>
+    </View>
+  );
 };
 
 export const ManualEntryScreen = ({ navigation }) => {
@@ -124,13 +191,10 @@ export const ManualEntryScreen = ({ navigation }) => {
 
       <View style={styles.footer}>
         {loading ? (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="small" color={Colors.primary} />
-            <Text style={styles.loadingText}>Analiz ediliyor...</Text>
-          </View>
+          <ManualLoadingBar />
         ) : (
           <GradientButton
-            title="İçerikleri Analiz Et"
+            title="Icerikleri Analiz Et"
             onPress={handleAnalyze}
             style={[!text.trim() && styles.buttonDisabled]}
           />
@@ -230,16 +294,31 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingBottom: 40,
   },
-  loadingContainer: {
+  manualLoadingWrap: {
+    paddingVertical: 12,
+  },
+  manualLoadingRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 16,
+    marginBottom: 10,
   },
-  loadingText: {
+  manualLoadingText: {
     ...Typography.body,
     color: Colors.primary,
+    fontWeight: '600',
     marginLeft: 10,
+  },
+  manualProgressBar: {
+    height: 6,
+    backgroundColor: Colors.borderLight,
+    borderRadius: 3,
+    overflow: 'hidden',
+  },
+  manualProgressFill: {
+    height: '100%',
+    backgroundColor: Colors.primary,
+    borderRadius: 3,
   },
   buttonDisabled: {
     opacity: 0.5,
