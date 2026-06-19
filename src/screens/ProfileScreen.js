@@ -64,7 +64,7 @@ export const ProfileScreen = ({ navigation }) => {
           onPress={() => navigation.navigate('EditSkinType')}
           style={styles.editButton}
         >
-          <Text style={styles.editButtonText}>Degistir</Text>
+          <Text style={styles.editButtonText}>Değiştir</Text>
         </TouchableOpacity>
       </View>
 
@@ -78,7 +78,7 @@ export const ProfileScreen = ({ navigation }) => {
           <View>
             <Text style={styles.badgeSectionTitle}>Rozetlerim</Text>
             <Text style={styles.badgeSectionCount}>
-              {earnedCount}/{totalCount} rozet kazanildi
+              {earnedCount}/{totalCount} rozet kazanıldı
             </Text>
           </View>
           <Ionicons name="chevron-forward" size={20} color={Colors.textLight} />
@@ -142,7 +142,7 @@ export const ProfileScreen = ({ navigation }) => {
           <View style={styles.statDivider} />
           <View style={styles.statItem}>
             <Text style={styles.statValue}>{stats.detailViews || 0}</Text>
-            <Text style={styles.statLabel}>Inceleme</Text>
+            <Text style={styles.statLabel}>İnceleme</Text>
           </View>
         </View>
       </TouchableOpacity>
@@ -150,14 +150,14 @@ export const ProfileScreen = ({ navigation }) => {
       <View style={styles.menu}>
         <MenuItem icon="notifications-outline" label="Bildirimler" color={Colors.primary} />
         <MenuItem icon="shield-outline" label="Gizlilik" color={Colors.secondary} onPress={() => navigation.navigate('Privacy')} />
-        <MenuItem icon="help-circle-outline" label="Yardim ve Destek" color={Colors.primary} />
-        <MenuItem icon="information-circle-outline" label="Hakkinda" color={Colors.textSecondary} />
+        <MenuItem icon="help-circle-outline" label="Yardım ve Destek" color={Colors.primary} />
+        <MenuItem icon="information-circle-outline" label="Hakkında" color={Colors.textSecondary} />
       </View>
 
       <View style={styles.logoutSection}>
         <MenuItem
           icon="log-out-outline"
-          label="Cikis Yap"
+          label="Çıkış Yap"
           color={Colors.unsafe}
           onPress={logout}
           showArrow={false}

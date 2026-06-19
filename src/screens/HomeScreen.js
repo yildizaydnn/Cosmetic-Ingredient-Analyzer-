@@ -133,8 +133,8 @@ export const HomeScreen = ({ navigation }) => {
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.greeting}>
-        <Text style={styles.greetingText}>Merhaba, {user?.name || 'Kullanici'}</Text>
-        <Text style={styles.greetingSubtext}>Cilt bakim urunlerini kontrol edelim</Text>
+        <Text style={styles.greetingText}>Merhaba, {user?.name || 'Kullanıcı'}</Text>
+        <Text style={styles.greetingSubtext}>Cilt bakım ürünlerini kontrol edelim</Text>
       </View>
 
       {/* Istatistik Kartlari */}
@@ -144,19 +144,19 @@ export const HomeScreen = ({ navigation }) => {
             <StatCard
               icon="flask"
               value={stats.totalProducts}
-              label="Urun Tarand"
+              label="Ürün Tarandı"
               color={Colors.primary}
             />
             <StatCard
               icon="checkmark-circle"
               value={`%${stats.safePercent}`}
-              label="Guvenli"
+              label="Güvenli"
               color={Colors.safe}
             />
             <StatCard
               icon="flame"
               value={badgeStats.dailyStreak || 0}
-              label="Gunluk Seri"
+              label="Günlük Seri"
               color="#F97316"
             />
           </View>
@@ -168,10 +168,10 @@ export const HomeScreen = ({ navigation }) => {
                 <Ionicons name="alert-circle" size={20} color={Colors.mediumRisk} />
               </View>
               <View style={styles.insightContent}>
-                <Text style={styles.insightTitle}>En Sik Riskli Icerik</Text>
+                <Text style={styles.insightTitle}>En Sık Riskli İçerik</Text>
                 <Text style={styles.insightValue}>
                   {stats.topRisky}
-                  <Text style={styles.insightCount}> ({stats.topRiskyCount} urunde)</Text>
+                  <Text style={styles.insightCount}> ({stats.topRiskyCount} üründe)</Text>
                 </Text>
               </View>
             </View>
@@ -180,7 +180,7 @@ export const HomeScreen = ({ navigation }) => {
           {/* Icerik dagilimi */}
           {stats.totalIngredients > 0 && (
             <View style={styles.distributionCard}>
-              <Text style={styles.distributionTitle}>Icerik Dagilimi</Text>
+              <Text style={styles.distributionTitle}>İçerik Dağılımı</Text>
               <View style={styles.distributionBar}>
                 <View
                   style={[
@@ -210,7 +210,7 @@ export const HomeScreen = ({ navigation }) => {
               <View style={styles.distributionLegend}>
                 <View style={styles.legendItem}>
                   <View style={[styles.legendDot, { backgroundColor: Colors.safe }]} />
-                  <Text style={styles.legendText}>Guvenli ({stats.totalSafe})</Text>
+                  <Text style={styles.legendText}>Güvenli ({stats.totalSafe})</Text>
                 </View>
                 <View style={styles.legendItem}>
                   <View style={[styles.legendDot, { backgroundColor: Colors.mediumRisk }]} />
@@ -224,15 +224,15 @@ export const HomeScreen = ({ navigation }) => {
 
       <View style={styles.actions}>
         <ActionCard
-          title="Icerikleri Tara"
-          subtitle="Urun etiketinin fotografini cek"
+          title="İçerikleri Tara"
+          subtitle="Ürün etiketinin fotoğrafını çek"
           icon="camera-outline"
           colors={['#818CF8', '#6366F1']}
           onPress={() => navigation.navigate('Tara')}
         />
         <ActionCard
-          title="Manuel Giris"
-          subtitle="Icerik listesini yaz veya yapistir"
+          title="Manuel Giriş"
+          subtitle="İçerik listesini yaz veya yapıştır"
           icon="create-outline"
           colors={['#4ECDC4', '#34D399']}
           onPress={() => navigation.navigate('ManualEntry')}
@@ -242,13 +242,13 @@ export const HomeScreen = ({ navigation }) => {
       <View style={styles.historyHeader}>
         <Text style={styles.historyTitle}>Son Analizler</Text>
         <TouchableOpacity onPress={() => navigation.navigate('Geçmiş')}>
-          <Text style={styles.viewAll}>Tumunu Gor</Text>
+          <Text style={styles.viewAll}>Tümünü Gör</Text>
         </TouchableOpacity>
       </View>
 
       {recentHistory.length === 0 ? (
         <View style={styles.emptyHistory}>
-          <Text style={styles.emptyHistoryText}>Henuz analiz yapilmadi</Text>
+          <Text style={styles.emptyHistoryText}>Henüz analiz yapılmadı</Text>
         </View>
       ) : (
         recentHistory.map((item) => (

@@ -24,9 +24,9 @@ const parseIngredients = (text) => {
 };
 
 const MANUAL_STEPS = [
-  'Icerikler ayristiriliyor...',
-  'Veritabaninda araniyor...',
-  'Analiz tamamlaniyor...',
+  'İçerikler ayrıştırılıyor...',
+  'Veritabanında aranıyor...',
+  'Analiz tamamlanıyor...',
 ];
 
 const ManualLoadingBar = () => {
@@ -194,7 +194,7 @@ export const ManualEntryScreen = ({ navigation }) => {
           <ManualLoadingBar />
         ) : (
           <GradientButton
-            title="Icerikleri Analiz Et"
+            title="İçerikleri Analiz Et"
             onPress={handleAnalyze}
             style={[!text.trim() && styles.buttonDisabled]}
           />

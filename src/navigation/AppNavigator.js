@@ -19,6 +19,7 @@ import { HistoryScreen } from '../screens/HistoryScreen';
 import { ProfileScreen } from '../screens/ProfileScreen';
 import { PrivacyScreen } from '../screens/PrivacyScreen';
 import { BadgesScreen } from '../screens/BadgesScreen';
+import { CompareScreen } from '../screens/CompareScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -100,6 +101,7 @@ export const AppNavigator = () => {
           <Stack.Screen name="EditSkinType" component={SkinTypeScreen} />
           <Stack.Screen name="Privacy" component={PrivacyScreen} />
           <Stack.Screen name="Badges" component={BadgesScreen} />
+          <Stack.Screen name="Compare" component={CompareScreen} />
         </>
       )}
     </Stack.Navigator>

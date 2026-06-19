@@ -7,10 +7,15 @@ import { getHistory, clearHistory, deleteHistoryItem } from '../services/history
 
 export const HistoryScreen = ({ navigation }) => {
   const [history, setHistory] = useState([]);
+  const [compareMode, setCompareMode] = useState(false);
+  const [selected, setSelected] = useState([]);
 
   useFocusEffect(
     useCallback(() => {
       getHistory().then(setHistory);
+      // Ekrana her donuste secimi sifirla
+      setCompareMode(false);
+      setSelected([]);
     }, [])
   );
 
@@ -42,21 +47,45 @@ export const HistoryScreen = ({ navigation }) => {
     ]);
   };
 
+  const toggleSelect = (item) => {
+    if (selected.some((s) => s.id === item.id)) {
+      setSelected(selected.filter((s) => s.id !== item.id));
+    } else if (selected.length < 2) {
+      setSelected([...selected, item]);
+    }
+  };
+
+  const handleCompare = () => {
+    if (selected.length === 2) {
+      navigation.navigate('Compare', { product1: selected[0], product2: selected[1] });
+    }
+  };
+
   const renderItem = ({ item }) => {
     const total = item.safeCount + item.mediumCount + item.unsafeCount;
     const hasUnsafe = item.unsafeCount > 0;
     const hasMedium = item.mediumCount > 0;
     const dotColor = hasUnsafe ? Colors.unsafe : hasMedium ? Colors.mediumRisk : Colors.safe;
+    const isSelected = selected.some((s) => s.id === item.id);
+
+    const onPress = compareMode
+      ? () => toggleSelect(item)
+      : () => navigation.navigate('AnalysisResult', { historyItem: item });
+
+    const onLongPress = compareMode ? undefined : () => handleDelete(item.id);
 
     return (
       <TouchableOpacity
-        style={styles.card}
-        onPress={() =>
-          navigation.navigate('AnalysisResult', { historyItem: item })
-        }
-        onLongPress={() => handleDelete(item.id)}
+        style={[styles.card, compareMode && isSelected && styles.cardSelected]}
+        onPress={onPress}
+        onLongPress={onLongPress}
         activeOpacity={0.7}
       >
+        {compareMode && (
+          <View style={[styles.checkbox, isSelected && styles.checkboxChecked]}>
+            {isSelected && <Ionicons name="checkmark" size={16} color={Colors.white} />}
+          </View>
+        )}
         <View style={styles.cardContent}>
           <Text style={styles.productName} numberOfLines={1}>{item.productName}</Text>
           <View style={styles.meta}>
@@ -82,7 +111,7 @@ export const HistoryScreen = ({ navigation }) => {
             )}
           </View>
         </View>
-        <Ionicons name="chevron-forward" size={20} color={Colors.textLight} />
+        {!compareMode && <Ionicons name="chevron-forward" size={20} color={Colors.textLight} />}
       </TouchableOpacity>
     );
   };
@@ -91,12 +120,42 @@ export const HistoryScreen = ({ navigation }) => {
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Geçmiş</Text>
-        {history.length > 0 && (
-          <TouchableOpacity onPress={handleClearAll}>
-            <Text style={styles.clearText}>Temizle</Text>
-          </TouchableOpacity>
-        )}
+        <View style={styles.headerActions}>
+          {history.length >= 2 && (
+            <TouchableOpacity
+              onPress={() => {
+                setCompareMode(!compareMode);
+                setSelected([]);
+              }}
+              style={styles.headerButton}
+            >
+              <Ionicons
+                name={compareMode ? 'close' : 'git-compare-outline'}
+                size={18}
+                color={compareMode ? Colors.unsafe : Colors.primary}
+              />
+              <Text style={[styles.headerButtonText, compareMode && { color: Colors.unsafe }]}>
+                {compareMode ? 'Vazgeç' : 'Karşılaştır'}
+              </Text>
+            </TouchableOpacity>
+          )}
+          {!compareMode && history.length > 0 && (
+            <TouchableOpacity onPress={handleClearAll}>
+              <Text style={styles.clearText}>Temizle</Text>
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
+
+      {compareMode && (
+        <View style={styles.compareHint}>
+          <Ionicons name="information-circle-outline" size={16} color={Colors.primary} />
+          <Text style={styles.compareHintText}>
+            Karşılaştırmak için 2 ürün seçin ({selected.length}/2)
+          </Text>
+        </View>
+      )}
+
       <FlatList
         data={history}
         renderItem={renderItem}
@@ -113,6 +172,15 @@ export const HistoryScreen = ({ navigation }) => {
           </View>
         }
       />
+
+      {compareMode && selected.length === 2 && (
+        <View style={styles.compareFooter}>
+          <TouchableOpacity style={styles.compareButton} onPress={handleCompare} activeOpacity={0.8}>
+            <Ionicons name="git-compare" size={20} color={Colors.white} />
+            <Text style={styles.compareButtonText}>Karşılaştır</Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 };
@@ -134,10 +202,41 @@ const styles = StyleSheet.create({
     ...Typography.h1,
     color: Colors.textPrimary,
   },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+  },
+  headerButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  headerButtonText: {
+    ...Typography.body,
+    color: Colors.primary,
+    fontWeight: '600',
+  },
   clearText: {
     ...Typography.body,
     color: Colors.unsafe,
     fontWeight: '600',
+  },
+  compareHint: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.primary + '10',
+    marginHorizontal: 20,
+    marginBottom: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 12,
+    gap: 8,
+  },
+  compareHintText: {
+    ...Typography.bodySmall,
+    color: Colors.primary,
+    fontWeight: '500',
   },
   list: {
     paddingHorizontal: 20,
@@ -154,6 +253,24 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.04,
     shadowRadius: 3,
     elevation: 1,
+  },
+  cardSelected: {
+    borderWidth: 2,
+    borderColor: Colors.primary,
+  },
+  checkbox: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: Colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  checkboxChecked: {
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
   },
   cardContent: {
     flex: 1,
@@ -206,5 +323,26 @@ const styles = StyleSheet.create({
     color: Colors.textLight,
     marginTop: 6,
     textAlign: 'center',
+  },
+  compareFooter: {
+    paddingHorizontal: 20,
+    paddingBottom: 30,
+    paddingTop: 10,
+    backgroundColor: Colors.background,
+  },
+  compareButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.primary,
+    borderRadius: 16,
+    paddingVertical: 16,
+    gap: 8,
+  },
+  compareButtonText: {
+    ...Typography.subtitle,
+    color: Colors.white,
+    fontWeight: '700',
+    fontSize: 16,
   },
 });

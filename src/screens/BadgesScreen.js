@@ -55,7 +55,7 @@ export const BadgesScreen = ({ navigation }) => {
             <View style={styles.statDivider} />
             <View style={styles.statItem}>
               <Text style={styles.statValue}>{stats.detailViews || 0}</Text>
-              <Text style={styles.statLabel}>Inceleme</Text>
+              <Text style={styles.statLabel}>İnceleme</Text>
             </View>
           </View>
         </View>

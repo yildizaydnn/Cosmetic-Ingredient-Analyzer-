@@ -9,10 +9,10 @@ import { useAuth } from '../context/AuthContext';
 import { analyzeImage } from '../services/api';
 
 const LOADING_STEPS = [
-  { icon: 'camera-outline', text: 'Gorsel okunuyor...' },
-  { icon: 'text-outline', text: 'Icerikler ayiklaniyor...' },
-  { icon: 'flask-outline', text: 'Icerikler analiz ediliyor...' },
-  { icon: 'shield-checkmark-outline', text: 'Sonuclar hazirlaniyor...' },
+  { icon: 'camera-outline', text: 'Görsel okunuyor...' },
+  { icon: 'text-outline', text: 'İçerikler ayıklanıyor...' },
+  { icon: 'flask-outline', text: 'İçerikler analiz ediliyor...' },
+  { icon: 'shield-checkmark-outline', text: 'Sonuçlar hazırlanıyor...' },
 ];
 
 const LoadingScreen = () => {
@@ -123,7 +123,7 @@ const LoadingScreen = () => {
         </View>
 
         <Text style={styles.loadingHint}>
-          Bu islem yaklasik 1 dakika surebilir
+          Bu işlem yaklaşık 1 dakika sürebilir
         </Text>
       </View>
     </View>

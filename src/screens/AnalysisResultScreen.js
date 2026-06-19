@@ -81,9 +81,14 @@ export const AnalysisResultScreen = ({ route, navigation }) => {
   const total = ingredients.length || 1;
   const riskRatio = mediumCount / total;
 
+  // Ust siralardaki (ilk 5) riskli icerik sayisi
+  const topRiskyCount = ingredients.filter(
+    (i) => (i.riskLevel === 'medium' || i.riskLevel === 'unsafe') && i.position <= 5
+  ).length;
+
   const overallStatus =
     riskRatio > 0.4 ? 'unsafe' :
-    riskRatio > 0.15 ? 'medium' : 'safe';
+    (riskRatio > 0.1 || mediumCount >= 3 || topRiskyCount >= 1) ? 'medium' : 'safe';
 
   const statusConfig = {
     safe: { label: 'Güvenli Ürün', color: Colors.safe, icon: 'shield-checkmark' },
