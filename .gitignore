@@ -31,11 +31,27 @@ yarn-error.*
 *.pem
 
 # local env files
+.env
 .env*.local
 
 # typescript
 *.tsbuildinfo
 
-# generated native folders
-/ios
-/android
+# generated native folders (mobile/ altinda uretilir)
+ios/
+android/
+
+# Python / backend
+venv/
+venv.broken/
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+.pytest_cache/
+
+# IDE
+.idea/
+.vscode/
+*.swp

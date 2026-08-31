@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "mobile",
-    "slug": "mobile",
+    "name": "Cosmetic Ingredient Analyzer",
+    "slug": "cosmetic-ingredient-analyzer",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -14,8 +14,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.mobile",
-      "deploymentTarget": "16.0"
+      "bundleIdentifier": "com.anonymous.mobile"
     },
     "android": {
       "adaptiveIcon": {
@@ -29,7 +28,14 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-font"
+      "expo-font",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Ürün içerik etiketinin fotoğrafını seçebilmek için galeri erişimi gerekiyor.",
+          "cameraPermission": "Ürün içerik etiketini tarayabilmek için kamera erişimi gerekiyor."
+        }
+      ]
     ]
   }
 }
